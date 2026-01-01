@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="dashboard-container" style="border-top: 5px solid #d32f2f;"> 
+    <div class="dashboard-header">
+        <h1>Admin Dashboard 👑</h1>
+        <p>Manage all customer orders here.</p>
+    </div>
+
+    <div class="table-responsive">
+        <table class="royal-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer Details</th> <th>Item Ordered</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %} 
+                <tr>
+                    <td>
+                        <span class="order-id">#{{ order.id }}</span>
+                        <div style="font-size: 12px; color: #888; margin-top: 5px;">
+                            {{ order.date }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="user-name" style="color: #d32f2f;">{{ order.customer_name }}</div>
+                        <div class="contact-row"><i class="fas fa-phone"></i> {{ order.customer_phone }}</div>
+                    </td>
+                    <td>
+                        <div class="item-name">
+                            <i class="fas fa-birthday-cake" style="color: #D4AF37;"></i>
+                            {{ order.item_ordered }}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-pill {% if order.status == 'pu' %}status-success{% endif %}">
+    {{ order.get_status_display }}
+</span>
+                    </td>
+                    <td>
+                        <a href="{% url 'detail' order.id %}" class="btn-table-action" style="background: #2C2C2C; color: #D4AF37;">
+                            Manage
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 30px;">
+                        No orders received yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Order Management</h1>
+        <p>Manage your bakery orders efficiently.</p>
+    </div>
+
+    <div class="table-responsive">
+        <table class="royal-table">
+            <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Item Ordered</th>
+                    <th>Contact Info</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %} 
+                <tr>
+                    <td>
+                        <div class="user-name">{{ order.customer_name }}</div>
+                        <span class="order-id">ID: #{{ order.id }}</span>
+                    </td>
+                    <td>
+                        <div class="item-name">
+                            <i class="fas fa-birthday-cake" style="color: #D4AF37; margin-right:5px;"></i>
+                            {{ order.item_ordered }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contact-row"><i class="fas fa-envelope"></i> {{ order.customer_email }}</div>
+                        <div class="contact-row"><i class="fas fa-phone"></i> {{ order.customer_phone }}</div>
+                    </td>
+                    <td>
+                        <a href="{% url 'detail' order.id %}" class="btn-table-action">
+                            View Details
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 30px; color: #777;">
+                        No orders received yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="form-wrapper">
+    <div class="royal-form-card">
+        
+        <div class="form-header">
+            <h1>Start Your Order</h1>
+            <p>Please enter your contact details to proceed.</p>
+        </div>
+
+        <form method="POST" action="">
+            {% csrf_token %}
+            
+            <div class="form-fields-container">
+                {{ form.as_p }}
+            </div>
+
+            <div class="payment-section" style="margin: 20px 0; background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #ddd;">
+                
+                <h4 style="color: #2C2C2C; margin-bottom: 15px; font-size: 1.1rem; font-weight: bold;">Select Payment Method:</h4>
+
+                <label style="display: block; cursor: pointer; margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
+                    <input name="payment_type" type="radio" value="cod" checked onclick="hideQR()" />
+                    <span style="font-size: 1rem; color: #333; margin-left: 10px; font-weight: bold;">Pay on Pickup (Cash)</span>
+                </label>
+
+                <label style="display: block; cursor: pointer; margin-bottom: 10px; padding: 10px; border: 1px solid #D4AF37; border-radius: 8px; background-color: #fffcf0;">
+                    <input name="payment_type" type="radio" value="online" onclick="showQR()" />
+                    <span style="font-size: 1rem; color: #333; margin-left: 10px; font-weight: bold;">Pay Online (UPI)</span>
+                    
+                    <div style="margin-left: 30px; margin-top: 5px;">
+                        <span style="background: #5f259f; color: white; padding: 2px 5px; border-radius: 3px; font-size: 0.7rem;">PhonePe</span>
+                        <span style="background: #1a73e8; color: white; padding: 2px 5px; border-radius: 3px; font-size: 0.7rem;">GPay</span>
+                        <span style="background: #008cff; color: white; padding: 2px 5px; border-radius: 3px; font-size: 0.7rem;">Paytm</span>
+                    </div>
+                </label>
+
+                <div id="qr-box" style="display: none; text-align: center; margin-top: 15px; border-top: 2px dashed #D4AF37; padding-top: 15px;">
+                    <p style="color: #D4AF37; font-weight: bold; font-size: 0.9rem;">Scan & Pay to A1 Bakery</p>
+                    
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=8421857457@upi&pn=A1Bakery" 
+                         alt="Payment QR" 
+                         style="width: 150px; border-radius: 10px; border: 3px solid #2C2C2C;">
+                    
+                    <p style="font-size: 0.8rem; color: #555; margin-top: 5px;">
+                        Paying to: <strong>A1 Bakery</strong><br>
+                        UPI ID: <strong>8421857457@upi</strong>
+                    </p>
+
+                    <input type="text" name="transaction_id" placeholder="Enter Transaction/UTR ID (Optional)" 
+                           style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                </div>
+
+            </div>
+
+            <script>
+                function showQR() {
+                    document.getElementById('qr-box').style.display = 'block';
+                }
+                function hideQR() {
+                    document.getElementById('qr-box').style.display = 'none';
+                }
+            </script>
+            <div class="form-actions">
+                <button type="submit" class="btn-royal-submit">
+                    Proceed Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+            
+            <div class="cancel-link">
+                <a href="{% url 'home' %}">Cancel & Go Back</a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class='header-h1'>
+<h1>Order Details</h1>
+</div>
+<div class="row">
+  <div class="col s6">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">{{ order.item_ordered }}</span>
+         <p>{{ order.customer_name }}</p>
+        <p>Email Address: {{ order.customer_email }}</p>     
+        <p>Phone Number: {{ order.customer_phone }}</p>  
+          </div>
+  {% comment %} Delete/Update Buttons {% endcomment %}
+        <div class="card-action">
+          <a href="{% url 'create_order' %}"><span class="yellow-text text-darken-4">Create Order</span></a>
+            <a onclick="return confirm('Are you sure you want to delete this?')" href="{% url 'delete_order' order.id %}"><span class="yellow-text text-darken-4">Delete</a>
+            <a href="{% url 'update_order' order.id %}"><span class="yellow-text text-darken-4">Update</a>
+            
+            </div>
+      </div>
+    </div>
+ 
+
+  {% comment %}Box card:  {% endcomment %}
+  <div class="col s6">  
+  <form action="{% url 'box' order.id %}"method="post">
+        {% csrf_token %}
+        {{ box_form.as_p }}
+        <input type="submit" class="btn light-green darken-4" value="submit">
+      </form>
+
+      
+      
+    <table class="striped">
+      <thead>
+        <tr><th>Date</th>
+        <th>Box Size</th>
+        <th>Type of Muffin</th>
+        <th>Order Number</th>
+        <th>Order Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for box  in order.box_set.all %}
+          <tr>
+            <td>{{box.date}}</td>            
+            <td>{{box.get_box_display}}</td>
+            <td>{{box.get_item_ordered_display}}
+            <td>{{order.id}}</td>
+            <td>{{order.get_status_display}}</td>
+            {% comment %} DELETE  {% endcomment %}
+            <td><a onclick="return confirm('Are you sure you want to delete this?')" class="btn  deep-orange accent-4" href="{% url 'delete_box' order.id box.id %}" >DELETE</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% comment %} Order Tracker Card {% endcomment %}
+{% comment %} CONDITIONAL VIEW OF THIS FORM: {% endcomment %}
+{% if 'auth.view_group' in perms %}
+
+<div class="row">
+  <div class="col s6">  
+  <h4>Order Status</h4>
+
+ 
+    <form action="{% url 'status' order.id %}"method="post">
+        {% csrf_token %}
+        {{ order_tracker.as_p }}
+        <input type="submit" class="btn light-green darken-4" value="Submit Order Status"> 
+      </form>
+  </div>
+{% endif %}
+</div>
+
+
+
+
+
+<script>
+  const dateEl = document.getElementById('id_date');
+  M.Datepicker.init(dateEl, {
+    format: 'yyyy-mm-dd',
+    defaultDate: new Date(),
+    setDefaultDate: true,
+    autoClose: true,
+    minDate: new Date()
+  });
+
+ const selectEl = document.getElementById('id_box');
+  M.FormSelect.init(selectEl);
+
+  const selectEl2 = document.getElementById('id_item_ordered');
+  M.FormSelect.init(selectEl2);
+
+  const selectEl3 = document.getElementById('id_status');
+  M.FormSelect.init(selectEl3);
+
+  {% comment %} const selectEl4 = document.getElementById('id_order';
+  M.FormSelect.init(selectEl4); {% endcomment %}
+
+
+</script>
+
+
+
+
+{% endblock %}
