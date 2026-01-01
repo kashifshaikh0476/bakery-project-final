@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
-import django_on_heroku
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -138,7 +138,6 @@ GOOGLE_MAPS_API_KEY='AIzaSyCgs1hVUNcVzjhRtSA8XJSVBnQcm_yIzqo'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-django_on_heroku.settings(locals())
 # settings.py ke sabse end mein paste karo
 
 JAZZMIN_SETTINGS = {
