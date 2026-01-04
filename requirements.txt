@@ -7,4 +7,4 @@ django-phonenumber-field
 phonenumberslite
 sqlparse
 pytz
-whitenoise
+whitenoise==6.5.0
