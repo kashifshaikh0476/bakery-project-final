@@ -2108,4 +2108,35 @@ html {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
 }
+/* Input boxes ko stylish aur modern banane ke liye */
+input.form-control, 
+.royal-form-card input {
+    color: #000000 !important; /* Permanent Black Text */
+    background-color: #ffffff !important;
+    border: 2px solid #ddd !important;
+    border-radius: 12px !important; /* Rounded corners for modern look */
+    padding: 12px 15px !important;
+    transition: all 0.3s ease-in-out !important; /* Smooth effect ke liye */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1) !important;
+}
 
+/* Jab user box par click kare (Hover/Focus Effect) */
+input.form-control:focus, 
+.royal-form-card input:focus {
+    border-color: #c59d1f !important; /* Gold border */
+    box-shadow: 0 0 10px rgba(197, 157, 31, 0.3) !important; /* Soft Gold Glow */
+    transform: translateY(-2px); /* Halkasa upar uthne wala effect */
+    outline: none !important;
+}
+
+/* Signup button par animation */
+.btn-royal-submit {
+    background: linear-gradient(135deg, #c59d1f 0%, #a37f16 100%) !important;
+    border: none !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+.btn-royal-submit:hover {
+    transform: scale(1.03) !important; /* Hover karne par button bada hoga */
+    box-shadow: 0 5px 15px rgba(163, 127, 22, 0.4) !important;
+}
