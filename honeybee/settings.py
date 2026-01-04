@@ -1,17 +1,17 @@
 import os
 from pathlib import Path
+# import django_on_heroku  <-- Ye hata diya kyunki ye error de raha tha
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-e7y2svjrg+u-1s+$*@u_vkemd=j_%*uvk&+76)_9ii94xip#31'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
-# Application definition
+# Isse bina slash (/) ke bhi about page khul jayega
+APPEND_SLASH = True 
+
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
@@ -27,7 +27,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Professional CSS ke liye
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Professional CSS ke liye add kiya
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -76,13 +76,13 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Static & Media Files Settings
+# Static & Media Settings (Images show hone ke liye)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_REDIRECT_URL = '/order/order'
 LOGOUT_REDIRECT_URL = '/'
@@ -90,7 +90,8 @@ LOGOUT_REDIRECT_URL = '/'
 GOOGLE_MAPS_API_KEY='AIzaSyCgs1hVUNcVzjhRtSA8XJSVBnQcm_yIzqo'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Admin Panel Design (Jazzmin)
+# django_on_heroku.settings(locals()) <-- Ye bhi hata diya
+
 JAZZMIN_SETTINGS = {
     "site_title": "A1 Bakery Admin",
     "site_header": "A1 Bakery Manager",
@@ -111,7 +112,7 @@ JAZZMIN_SETTINGS = {
 }
 
 JAZZMIN_UI_TWEAKS = {
-    "theme": "darkly",
+    "theme": "darkly", 
     "navbar": "navbar-dark", 
     "sidebar": "sidebar-dark-warning",
     "accent": "accent-warning",
