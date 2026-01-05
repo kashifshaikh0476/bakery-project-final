@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('about/', views.about, name='about'),
+    path('', views.about, name='about'),
     path('shop/', views.shop, name='shop'),
     # UPDATED: Product ID ke sath link
     path('create_order/<int:product_id>/', views.create_order, name='create_order'),
