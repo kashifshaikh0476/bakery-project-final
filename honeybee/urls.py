@@ -3,14 +3,12 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views # Ye line add karni hai
+from main_app import views as main_views # Ye line imports mein add karein
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
-    # === LOGOUT REDIRECT FIX ===
-    # Ye line aapko seedha Home page par bhejegi aur Logout 405 error bhi theek karegi
-    path('accounts/logout/', auth_views.LogoutView.as_view(next_page='home', http_method_names=['get', 'post']), name='logout'),
-    
+    # Purani logout line ko hata kar ye daalein
+    path('accounts/logout/', main_views.custom_logout, name='logout'),
     path('', include('main_app.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
