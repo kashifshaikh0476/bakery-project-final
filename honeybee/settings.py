@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-# import django_on_heroku  <-- Ye hata diya kyunki ye error de raha tha
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -9,7 +8,6 @@ SECRET_KEY = 'django-insecure-e7y2svjrg+u-1s+$*@u_vkemd=j_%*uvk&+76)_9ii94xip#31
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
-# Isse bina slash (/) ke bhi about page khul jayega
 APPEND_SLASH = True 
 
 INSTALLED_APPS = [
@@ -27,7 +25,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Professional CSS ke liye add kiya
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -76,7 +74,6 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Static & Media Settings (Images show hone ke liye)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -85,12 +82,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_REDIRECT_URL = '/order/order'
-LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'home' # <-- Changed to 'home' name to match redirect
 
 GOOGLE_MAPS_API_KEY='AIzaSyCgs1hVUNcVzjhRtSA8XJSVBnQcm_yIzqo'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# django_on_heroku.settings(locals()) <-- Ye bhi hata diya
 
 JAZZMIN_SETTINGS = {
     "site_title": "A1 Bakery Admin",
@@ -99,6 +94,7 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Welcome, Owner!",
     "copyright": "A1 Bakery Ltd",
     "search_model": "main_app.Product",
+    "logout_link": "logout", # <-- Added to bypass Jazzmin logout page
     "topmenu_links": [
         {"name": "Open Website", "url": "home", "permissions": ["auth.view_user"]},
     ],
