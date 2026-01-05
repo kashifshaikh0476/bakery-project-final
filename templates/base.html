@@ -51,7 +51,12 @@
 
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'order' %}">My Orders</a></li>
-                    <li><a href="{% url 'logout' %}" class="btn-logout">Log Out</a></li>
+                    <li><form action="{% url 'logout' %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" style="background:none; border:none; color:inherit; cursor:pointer; padding:0;">
+        Logout
+    </button>
+</form></li>
                 {% else %}
                     <li><a href="{% url 'login' %}">Log In</a></li>
                     <li><a href="{% url 'signup' %}" class="btn-signup">Sign Up</a></li>
