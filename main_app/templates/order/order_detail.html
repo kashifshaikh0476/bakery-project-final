@@ -1,111 +1,192 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
+
+<style>
+    /* === EXISTING STYLES === */
+    .whatsapp-btn-royal {
+        background-color: #25D366 !important; color: #ffffff !important; font-weight: 700;
+        border-radius: 50px; padding: 12px 35px; display: inline-flex; align-items: center; justify-content: center;
+        text-transform: none; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4); transition: all 0.3s ease;
+        margin-bottom: 15px; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; width: 100%; max-width: 300px;
+    }
+    .whatsapp-btn-royal:hover {
+        background-color: #1ebc57 !important; box-shadow: 0 8px 20px rgba(37, 211, 102, 0.6); transform: translateY(-3px);
+    }
+    .whatsapp-btn-royal i { margin-right: 12px; font-size: 1.4rem; }
+    
+    .card-action-center { text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .other-links { margin-top: 15px; display: flex; gap: 20px; font-weight: 600; }
+
+    /* === NEW: PRINT BUTTON STYLE === */
+    .print-btn-royal {
+        background-color: #2C2C2C !important; color: #D4AF37 !important; font-weight: 700; border: 1px solid #D4AF37;
+        border-radius: 50px; padding: 10px 30px; display: inline-flex; align-items: center; justify-content: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-bottom: 10px; width: 100%; max-width: 300px; cursor: pointer;
+        font-family: 'Poppins', sans-serif; transition: 0.3s;
+    }
+    .print-btn-royal:hover { background-color: #D4AF37 !important; color: #000 !important; transform: translateY(-2px); }
+
+    /* === NEW: INVOICE PRINT SETTINGS (Jaadu Yahan Hai) === */
+    #printable-invoice { display: none; } /* Screen par chupa rahega */
+
+    @media print {
+        /* Jab Print dabayenge, baaki sab gayab */
+        body * { visibility: hidden; }
+        .navbar, footer, .dashboard-container, .row, .header-h1 { display: none !important; }
+        
+        /* Sirf Bill dikhega */
+        #printable-invoice, #printable-invoice * { visibility: visible; }
+        #printable-invoice {
+            position: absolute; left: 0; top: 0; width: 100%; display: block !important; padding: 20px;
+        }
+    }
+
+    /* Bill Design */
+    .invoice-box {
+        max-width: 800px; margin: auto; padding: 30px; border: 2px solid #eee;
+        font-size: 16px; line-height: 24px; font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif; color: #555;
+    }
+    .invoice-header { display: flex; justify-content: space-between; border-bottom: 2px solid #D4AF37; padding-bottom: 20px; margin-bottom: 20px; }
+    .company-title { font-size: 40px; color: #D4AF37; font-family: 'Playfair Display', serif; font-weight: bold; }
+    .invoice-table { width: 100%; line-height: inherit; text-align: left; border-collapse: collapse; }
+    .invoice-table td { padding: 10px; vertical-align: top; }
+    .invoice-table tr.heading td { background: #eee; border-bottom: 1px solid #ddd; font-weight: bold; }
+    .invoice-table tr.item td { border-bottom: 1px solid #eee; }
+    .invoice-table tr.total td { border-top: 2px solid #eee; font-weight: bold; font-size: 1.2rem; color: #D4AF37; }
+</style>
+
 <div class='header-h1'>
-<h1>Order Details</h1>
+  <h1 style="font-family: 'Playfair Display', serif; color: #D4AF37; text-align: center;">Order Details</h1>
 </div>
+
 <div class="row">
-  <div class="col s6">
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">{{ order.item_ordered }}</span>
-         <p>{{ order.customer_name }}</p>
-        <p>Email Address: {{ order.customer_email }}</p>     
-        <p>Phone Number: {{ order.customer_phone }}</p>  
-          </div>
-  {% comment %} Delete/Update Buttons {% endcomment %}
-        <div class="card-action">
-          <a href="{% url 'create_order' %}"><span class="yellow-text text-darken-4">Create Order</span></a>
-            <a onclick="return confirm('Are you sure you want to delete this?')" href="{% url 'delete_order' order.id %}"><span class="yellow-text text-darken-4">Delete</a>
-            <a href="{% url 'update_order' order.id %}"><span class="yellow-text text-darken-4">Update</a>
+  <div class="col s12 m6 offset-m3"> 
+    <div class="card z-depth-3" style="border-radius: 20px; border: 1px solid #eee;">
+      <div class="card-content" style="padding: 30px;">
+        <span class="card-title" style="color: #D4AF37; font-weight: bold; text-align: center; font-family: 'Playfair Display', serif; font-size: 2rem;">
+            {% if order.product %}
+                {{ order.product.name }}
+                <br>
+                <span style="font-size: 1rem; color: #777; font-family: 'Poppins', sans-serif;">(Quantity: {{ order.quantity }})</span>
+            {% else %}
+                Unknown Item
+            {% endif %}
+        </span>
+        
+        <div class="divider" style="margin: 20px 0; background-color: #D4AF37;"></div>
+
+        <div style="font-family: 'Poppins', sans-serif; color: #444; font-size: 1.1rem;">
+            <p style="margin-bottom: 10px;"><i class="fas fa-user" style="color: #D4AF37; margin-right: 10px;"></i> <strong>{{ order.customer_name }}</strong></p>
+            <p style="margin-bottom: 10px;"><i class="fas fa-envelope" style="color: #D4AF37; margin-right: 10px;"></i> {{ order.customer_email }}</p>     
+            <p style="margin-bottom: 10px;"><i class="fas fa-phone" style="color: #D4AF37; margin-right: 10px;"></i> {{ order.customer_phone }}</p>
             
+            <div style="margin-top: 20px; background: #fffcf0; padding: 15px; border-radius: 10px; border: 1px dashed #D4AF37;">
+                <p style="margin-bottom: 5px;"><i class="fas fa-map-marker-alt" style="color: #D4AF37; margin-right: 10px;"></i> <strong>Address:</strong></p>
+                <p style="margin-left: 30px;">{{ order.address }}</p>
+                <p style="margin-left: 30px; margin-top: 5px;"><strong>City:</strong> {{ order.city }}</p>
             </div>
+        </div>
+        
+        <div style="margin-top: 25px; text-align: center;">
+            <span class="new badge" style="float: none; padding: 8px 20px; font-size: 1rem; border-radius: 50px; background-color: #2C2C2C;" data-badge-caption="">
+                Status: {{ order.status }}
+            </span>
+        </div>
+      </div>
+
+      <div class="card-action card-action-center" style="padding-bottom: 30px; border-top: none;">
+          
+          <a id="whatsappBtn" 
+             href="https://wa.me/918421857457?text=Hello%20A1%20Bakery,%20I%20placed%20a%20new%20order!%0A%0A*Order%20ID:*%20%23{{ order.id }}%0A*Item:*%20{{ order.product.name }}%20(x{{ order.quantity }})%0A*Customer:*%20{{ order.customer_name }}%0A*Address:*%20{{ order.address }}%0A*Status:*%20{{ order.status }}" 
+             target="_blank" 
+             class="whatsapp-btn-royal waves-effect waves-light">
+             <i class="fab fa-whatsapp"></i> Send Order to Owner
+          </a>
+
+          <button onclick="window.print()" class="print-btn-royal waves-effect waves-dark">
+             <i class="fas fa-print" style="margin-right: 10px;"></i> Print Invoice
+          </button>
+
+          <div class="other-links">
+              <a href="{% url 'shop' %}" style="color: #D4AF37;">
+                  <i class="fas fa-shopping-bag"></i> Shop Again
+              </a>
+              <a onclick="return confirm('Are you sure you want to delete this order?')" href="{% url 'delete_order' order.id %}" style="color: #d32f2f;">
+                  <i class="fas fa-trash"></i> Delete
+              </a>
+          </div>
       </div>
     </div>
- 
-
-  {% comment %}Box card:  {% endcomment %}
-  <div class="col s6">  
-  <form action="{% url 'box' order.id %}"method="post">
-        {% csrf_token %}
-        {{ box_form.as_p }}
-        <input type="submit" class="btn light-green darken-4" value="submit">
-      </form>
-
-      
-      
-    <table class="striped">
-      <thead>
-        <tr><th>Date</th>
-        <th>Box Size</th>
-        <th>Type of Muffin</th>
-        <th>Order Number</th>
-        <th>Order Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for box  in order.box_set.all %}
-          <tr>
-            <td>{{box.date}}</td>            
-            <td>{{box.get_box_display}}</td>
-            <td>{{box.get_item_ordered_display}}
-            <td>{{order.id}}</td>
-            <td>{{order.get_status_display}}</td>
-            {% comment %} DELETE  {% endcomment %}
-            <td><a onclick="return confirm('Are you sure you want to delete this?')" class="btn  deep-orange accent-4" href="{% url 'delete_box' order.id box.id %}" >DELETE</a></td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
   </div>
-{% comment %} Order Tracker Card {% endcomment %}
-{% comment %} CONDITIONAL VIEW OF THIS FORM: {% endcomment %}
-{% if 'auth.view_group' in perms %}
-
-<div class="row">
-  <div class="col s6">  
-  <h4>Order Status</h4>
-
- 
-    <form action="{% url 'status' order.id %}"method="post">
-        {% csrf_token %}
-        {{ order_tracker.as_p }}
-        <input type="submit" class="btn light-green darken-4" value="Submit Order Status"> 
-      </form>
-  </div>
-{% endif %}
 </div>
 
+<div id="printable-invoice">
+    <div class="invoice-box">
+        <div class="invoice-header">
+            <div>
+                <div class="company-title">A1 Bakery</div>
+                <div>Malegaon, Maharashtra</div>
+                <div>Phone: +91 8421857457</div>
+            </div>
+            <div style="text-align: right;">
+                <h3 style="margin: 0; color: #333;">INVOICE</h3>
+                <div>Order #: <strong>{{ order.id }}</strong></div>
+                <div>Date: {% now "jS F Y" %}</div>
+            </div>
+        </div>
 
+        <div style="margin-bottom: 20px;">
+            <strong>Bill To:</strong><br>
+            {{ order.customer_name }}<br>
+            {{ order.customer_phone }}<br>
+            {{ order.address }}, {{ order.city }}
+        </div>
 
+        <table class="invoice-table">
+            <tr class="heading">
+                <td>Item Description</td>
+                <td style="text-align: center;">Qty</td>
+                <td style="text-align: right;">Price</td>
+                <td style="text-align: right;">Total</td>
+            </tr>
 
+            <tr class="item">
+                <td>{{ order.product.name }}</td>
+                <td style="text-align: center;">{{ order.quantity }}</td>
+                <td style="text-align: right;">₹{{ order.product.price }}</td>
+                <td style="text-align: right;">₹{% widthratio order.product.price 1 order.quantity %}</td>
+            </tr>
+
+            <tr class="total">
+                <td></td>
+                <td></td>
+                <td style="text-align: right;">Total Amount:</td>
+                <td style="text-align: right;">₹{% widthratio order.product.price 1 order.quantity %}</td>
+            </tr>
+        </table>
+
+        <div style="margin-top: 40px; text-align: center; font-size: 0.9rem; color: #777; border-top: 1px solid #eee; padding-top: 20px;">
+            <p>Thank you for choosing A1 Bakery!</p>
+            <div style="margin-top: 30px; text-align: right; font-weight: bold; color: #000;">
+                Authorized Signatory<br>
+                <span style="font-family: 'Playfair Display', serif; color: #D4AF37;">A1 Bakery</span>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-  const dateEl = document.getElementById('id_date');
-  M.Datepicker.init(dateEl, {
-    format: 'yyyy-mm-dd',
-    defaultDate: new Date(),
-    setDefaultDate: true,
-    autoClose: true,
-    minDate: new Date()
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('placed') === 'true') {
+        setTimeout(function() {
+            const btn = document.getElementById('whatsappBtn');
+            if(btn) btn.click();
+        }, 1000); 
+    }
   });
-
- const selectEl = document.getElementById('id_box');
-  M.FormSelect.init(selectEl);
-
-  const selectEl2 = document.getElementById('id_item_ordered');
-  M.FormSelect.init(selectEl2);
-
-  const selectEl3 = document.getElementById('id_status');
-  M.FormSelect.init(selectEl3);
-
-  {% comment %} const selectEl4 = document.getElementById('id_order';
-  M.FormSelect.init(selectEl4); {% endcomment %}
-
-
 </script>
-
-
-
 
 {% endblock %}
