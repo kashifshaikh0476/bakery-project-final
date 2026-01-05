@@ -3,58 +3,122 @@
 
 {% block content %}
 
-<div class="dashboard-container" style="border-top: 5px solid #d32f2f;"> 
-    <div class="dashboard-header">
-        <h1>Admin Dashboard 👑</h1>
-        <p>Manage all customer orders here.</p>
+<style>
+    /* Stats Cards Design */
+    .stats-container {
+        display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;
+    }
+    .stat-card {
+        flex: 1; min-width: 250px; background: #fff; padding: 20px;
+        border-radius: 15px; border-left: 5px solid #D4AF37;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .stat-number { font-size: 2.2rem; font-weight: bold; color: #2C2C2C; }
+    .stat-label { color: #777; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+    
+    .admin-table-container {
+        background: #fff; border-radius: 15px; overflow: hidden;
+        border: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    /* Dropdown Visibility Fix */
+    .force-visible-select {
+        display: block !important; width: 140px !important; height: 40px !important;
+        background-color: #f9f9f9 !important; border: 1px solid #ccc !important;
+        border-radius: 5px !important; color: #333 !important; padding: 5px !important;
+    }
+</style>
+
+<div class="dashboard-container" style="padding: 40px 5%; max-width: 1400px; margin: 0 auto;">
+    
+    <div class="dashboard-header" style="text-align: center; margin-bottom: 40px;">
+        <h1 style="font-family: 'Playfair Display', serif; color: #D4AF37; font-size: 3rem;">
+            Admin Dashboard <span style="font-size: 2rem;">👑</span>
+        </h1>
+        <p style="color: #777;">Overview of all bakery operations</p>
     </div>
 
-    <div class="table-responsive">
-        <table class="royal-table">
-            <thead>
+    <div class="stats-container">
+        <div class="stat-card">
+            <div>
+                <div class="stat-number">{{ total_orders }}</div>
+                <div class="stat-label">Total Orders</div>
+            </div>
+            <div style="font-size: 2.5rem; color: #eee;"><i class="fas fa-shopping-bag" style="color: #D4AF37;"></i></div>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #ff9800;">
+            <div>
+                <div class="stat-number" style="color: #ff9800;">{{ pending_count }}</div>
+                <div class="stat-label">Pending Orders</div>
+            </div>
+            <div style="font-size: 2.5rem; color: #eee;"><i class="fas fa-clock" style="color: #ffe0b2;"></i></div>
+        </div>
+
+        <div class="stat-card" style="border-left-color: #4CAF50;">
+            <div>
+                <div class="stat-number" style="color: #4CAF50;">₹ {{ revenue }}</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+            <div style="font-size: 2.5rem; color: #eee;"><i class="fas fa-rupee-sign" style="color: #c8e6c9;"></i></div>
+        </div>
+    </div>
+
+    <div class="admin-table-container">
+        <table class="highlight responsive-table" style="width: 100%;">
+            <thead style="background-color: #2C2C2C; color: #D4AF37;">
                 <tr>
-                    <th>Order ID</th>
-                    <th>Customer Details</th> <th>Item Ordered</th>
-                    <th>Status</th>
+                    <th style="padding: 20px;">Order ID</th>
+                    <th>Customer</th>
+                    <th>Item Ordered</th>
+                    <th>Address</th>
+                    <th style="text-align: center;">Update Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for order in orders %} 
-                <tr>
+                <tr style="border-bottom: 1px solid #f1f1f1;">
+                    <td style="padding: 20px; font-weight: bold; color: #999;">#{{ order.id }}</td>
                     <td>
-                        <span class="order-id">#{{ order.id }}</span>
-                        <div style="font-size: 12px; color: #888; margin-top: 5px;">
-                            {{ order.date }}
-                        </div>
+                        <div style="font-weight: bold; color: #2C2C2C;">{{ order.customer_name }}</div>
+                        <div style="font-size: 0.85rem; color: #777;">{{ order.customer_phone }}</div>
                     </td>
                     <td>
-                        <div class="user-name" style="color: #d32f2f;">{{ order.customer_name }}</div>
-                        <div class="contact-row"><i class="fas fa-phone"></i> {{ order.customer_phone }}</div>
+                        {% if order.product %}
+                            <span style="color: #D4AF37; font-weight: 600;">{{ order.product.name }}</span>
+                            <br><span style="font-size: 0.8rem; color: #555;">Qty: {{ order.quantity }}</span>
+                        {% else %}
+                            <span style="color: red;">Unknown</span>
+                        {% endif %}
                     </td>
-                    <td>
-                        <div class="item-name">
-                            <i class="fas fa-birthday-cake" style="color: #D4AF37;"></i>
-                            {{ order.item_ordered }}
-                        </div>
+                    <td style="max-width: 200px;">
+                        <span style="font-size: 0.9rem; color: #555;">{{ order.address|truncatechars:30 }}</span>
                     </td>
-                    <td>
-                        <span class="status-pill {% if order.status == 'pu' %}status-success{% endif %}">
-    {{ order.get_status_display }}
-</span>
+                    <td style="text-align: center;">
+                        <form action="{% url 'status' order.id %}" method="POST" style="margin: 0;">
+                            {% csrf_token %}
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <select name="status" class="browser-default force-visible-select">
+                                    <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="In Progress" {% if order.status == 'In Progress' %}selected{% endif %}>Cooking</option>
+                                    <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                    <option value="Ready For Pickup" {% if order.status == 'Ready For Pickup' %}selected{% endif %}>Ready For Pickup</option>
+                                    <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                </select>
+                                <button type="submit" class="btn-floating waves-effect waves-light" style="background-color: #D4AF37;">
+                                    <i class="fas fa-check" style="color: white;"></i>
+                                </button>
+                            </div>
+                        </form>
                     </td>
-                    <td>
-                        <a href="{% url 'detail' order.id %}" class="btn-table-action" style="background: #2C2C2C; color: #D4AF37;">
-                            Manage
-                        </a>
+                    <td style="padding: 20px;">
+                        <a href="{% url 'detail' order.id %}" class="btn-small" style="background-color: #2C2C2C; border-radius: 20px; color: #D4AF37;">View</a>
                     </td>
                 </tr>
                 {% empty %}
-                <tr>
-                    <td colspan="5" style="text-align: center; padding: 30px;">
-                        No orders received yet.
-                    </td>
-                </tr>
+                <tr><td colspan="6" style="text-align: center; padding: 50px;">No Orders Found!</td></tr>
                 {% endfor %}
             </tbody>
         </table>
