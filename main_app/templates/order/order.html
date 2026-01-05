@@ -14,8 +14,7 @@
             <thead>
                 <tr>
                     <th>Customer Name</th>
-                    <th>Item Ordered</th>
-                    <th>Contact Info</th>
+                    <th>Item Ordered</th> <th>Status</th>       <th>Price</th>        <th>Contact Info</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -26,16 +25,44 @@
                         <div class="user-name">{{ order.customer_name }}</div>
                         <span class="order-id">ID: #{{ order.id }}</span>
                     </td>
+
                     <td>
                         <div class="item-name">
-                            <i class="fas fa-birthday-cake" style="color: #D4AF37; margin-right:5px;"></i>
-                            {{ order.item_ordered }}
+                            {% if order.product %}
+                                <span style="color: #D4AF37; font-weight: bold; font-size: 1.1rem;">
+                                    {{ order.product.name }}
+                                </span>
+                                <br>
+                                <span style="color: #777; font-size: 0.85rem;">
+                                    Qty: {{ order.quantity }}
+                                </span>
+                            {% else %}
+                                <span style="color: red;">Item Deleted</span>
+                            {% endif %}
                         </div>
                     </td>
+
+                    <td>
+                        <span style="padding: 5px 10px; border-radius: 4px; background: #222; color: #fff; border: 1px solid #444; font-size: 0.8rem;">
+                            {{ order.status }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {% if order.product %}
+                           <span style="font-weight: bold; color: #D4AF37;">
+                               ₹{% widthratio order.product.price 1 order.quantity %}
+                           </span>
+                        {% else %}
+                           -
+                        {% endif %}
+                    </td>
+
                     <td>
                         <div class="contact-row"><i class="fas fa-envelope"></i> {{ order.customer_email }}</div>
                         <div class="contact-row"><i class="fas fa-phone"></i> {{ order.customer_phone }}</div>
                     </td>
+
                     <td>
                         <a href="{% url 'detail' order.id %}" class="btn-table-action">
                             View Details
@@ -44,7 +71,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" style="text-align: center; padding: 30px; color: #777;">
+                    <td colspan="6" style="text-align: center; padding: 30px; color: #777;">
                         No orders received yet.
                     </td>
                 </tr>
