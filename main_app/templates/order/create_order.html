@@ -3,11 +3,49 @@
 
 {% block content %}
 
+<style>
+    /* Form ke labels aur text ko black karo */
+    .royal-form-card label, 
+    .royal-form-card p, 
+    .royal-form-card h1, 
+    .royal-form-card h3,
+    .royal-form-card span {
+        color: #000 !important; /* Black Text */
+    }
+    
+    /* Input box ko saaf dikhane ke liye styling */
+    .royal-form-card input[type="text"], 
+    .royal-form-card input[type="number"], 
+    .royal-form-card input[type="email"], 
+    .royal-form-card textarea,
+    .royal-form-card select {
+        color: #000 !important;
+        background-color: #fff !important; /* White Background */
+        border: 1px solid #ccc !important;
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+    
+    /* Placeholder text dikhne ke liye */
+    ::placeholder {
+        color: #555 !important;
+    }
+</style>
+
 <div class="form-wrapper">
     <div class="royal-form-card">
         
         <div class="form-header">
             <h1>Start Your Order</h1>
+            
+            {% if product %}
+                <div style="background: #fffcf0; border: 1px dashed #D4AF37; padding: 10px; margin: 10px 0; border-radius: 8px;">
+                    <h3 style="color: #D4AF37 !important; margin: 0;">Item: {{ product.name }}</h3>
+                    <p style="margin: 5px 0 0 0; font-weight: bold;">Price: ₹{{ product.price }}</p>
+                </div>
+            {% endif %}
             <p>Please enter your contact details to proceed.</p>
         </div>
 
@@ -37,23 +75,21 @@
                         <span style="background: #008cff; color: white; padding: 2px 5px; border-radius: 3px; font-size: 0.7rem;">Paytm</span>
                     </div>
                 </label>
+<div id="qr-box" style="display: none; text-align: center; margin-top: 15px; border-top: 2px dashed #D4AF37; padding-top: 15px;">
+    <p style="color: #D4AF37 !important; font-weight: bold; font-size: 0.9rem;">Scan & Pay to A1 Bakery</p>
+    
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=8421857457@ybl&pn=A1Bakery" 
+         alt="Payment QR" 
+         style="width: 150px; border-radius: 10px; border: 3px solid #2C2C2C;">
+    
+    <p style="font-size: 0.8rem; color: #555 !important; margin-top: 5px;">
+        Paying to: <strong>A1 Bakery</strong><br>
+        UPI ID: <strong>8421857457@ybl</strong>
+    </p>
 
-                <div id="qr-box" style="display: none; text-align: center; margin-top: 15px; border-top: 2px dashed #D4AF37; padding-top: 15px;">
-                    <p style="color: #D4AF37; font-weight: bold; font-size: 0.9rem;">Scan & Pay to A1 Bakery</p>
-                    
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=8421857457@upi&pn=A1Bakery" 
-                         alt="Payment QR" 
-                         style="width: 150px; border-radius: 10px; border: 3px solid #2C2C2C;">
-                    
-                    <p style="font-size: 0.8rem; color: #555; margin-top: 5px;">
-                        Paying to: <strong>A1 Bakery</strong><br>
-                        UPI ID: <strong>8421857457@upi</strong>
-                    </p>
-
-                    <input type="text" name="transaction_id" placeholder="Enter Transaction/UTR ID (Optional)" 
-                           style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px;">
-                </div>
-
+    <input type="text" name="transaction_id" placeholder="Enter Transaction/UTR ID (Optional)" 
+           style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px;">
+</div>
             </div>
 
             <script>
@@ -64,6 +100,7 @@
                     document.getElementById('qr-box').style.display = 'none';
                 }
             </script>
+            
             <div class="form-actions">
                 <button type="submit" class="btn-royal-submit">
                     Proceed Next <i class="fas fa-arrow-right"></i>
