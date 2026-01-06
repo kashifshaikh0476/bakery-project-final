@@ -33,6 +33,7 @@
         position: absolute;
         left: -9999px;
         top: -9999px;
+        background: white;
     }
 
     .invoice-box {
@@ -169,13 +170,22 @@
   // Direct Download Function
   function downloadInvoice() {
     const element = document.getElementById('printable-invoice');
+    
+    // Check if library is ready
+    if (typeof html2pdf === 'undefined') {
+        alert("Library is still loading. Please try again in 2 seconds.");
+        return;
+    }
+
     const options = {
-      margin: 0.5,
+      margin: 0.3,
       filename: 'A1_Bakery_Invoice_{{ order.id }}.pdf',
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
+      html2canvas: { scale: 3, useCORS: true },
       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
+
+    // This command triggers a direct download
     html2pdf().set(options).from(element).save();
   }
 
