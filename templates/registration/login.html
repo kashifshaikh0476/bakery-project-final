@@ -3,115 +3,135 @@
 
 {% block content %}
 
-<div class="form-wrapper" style="background-image: url('https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=1600&q=80'); background-size: cover; background-position: center;">
+<style>
+    /* Login Card Styling */
+    .form-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-image: url('https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=1600&q=80');
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
     
-    <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6);"></div>
+    .overlay {
+        position: absolute; top:0; left:0; width:100%; height:100%; 
+        background: rgba(0,0,0,0.6);
+    }
 
-    <div class="royal-form-card" style="position: relative; z-index: 2; max-width: 400px;">
-        
-        <div class="form-header">
-            <h1>Welcome Back</h1>
-            <p>Login to manage your orders.</p>
+    .royal-form-card {
+        position: relative; z-index: 2; 
+        background: rgba(255, 255, 255, 0.95);
+        padding: 40px;
+        border-radius: 15px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        border-top: 5px solid #D4AF37;
+    }
+
+    /* Eye Icon Logic */
+    .password-wrapper {
+        position: relative;
+        width: 100%;
+    }
+    /* Eye icon ko input ke andar fit karne ke liye */
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 45px; /* Input height ke hisaab se adjust kiya */
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #777;
+        z-index: 10;
+    }
+    .toggle-password:hover { color: #D4AF37; }
+
+    .custom-field { margin-bottom: 20px; }
+    .custom-field label { font-weight: bold; color: #333; display: block; margin-bottom: 5px; }
+    
+    /* Input Fields Style */
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box; /* Zaroori hai taaki padding se size na badhe */
+    }
+
+    .forgot-link {
+        display: block; text-align: right; color: #0d6efd; 
+        font-size: 0.9rem; margin-top: 5px; text-decoration: none; font-weight: 500;
+    }
+    .btn-royal-submit {
+        width: 100%; background: #D4AF37; color: white; padding: 12px;
+        border: none; border-radius: 50px; font-size: 1.1rem; font-weight: bold;
+        cursor: pointer; transition: 0.3s;
+    }
+    .btn-royal-submit:hover { background: #b89628; }
+</style>
+
+<div class="form-wrapper">
+    <div class="overlay"></div>
+
+    <div class="royal-form-card">
+        <div class="form-header" style="text-align: center; margin-bottom: 30px;">
+            <h1 style="font-family: 'Playfair Display', serif; color: #D4AF37; margin: 0;">Welcome Back</h1>
+            <p style="color: #666;">Login to manage your orders.</p>
         </div>
 
         <form method="POST">
             {% csrf_token %}
             
-            <div class="form-fields-container">
-                <div class="custom-field">
-                    <label>Username</label>
-                    {{ form.username }}
+            <div class="custom-field">
+                <label>Username</label>
+                {{ form.username }}
+            </div>
+
+            <div class="custom-field password-wrapper">
+                <label>Password</label>
+                {{ form.password }} <i class="fas fa-eye toggle-password" id="eyeIcon" onclick="togglePassword()"></i>
+            </div>
+
+            <div style="margin-top: -15px; margin-bottom: 25px;">
+                <a href="{% url 'password_reset' %}" class="forgot-link">Forgot Password?</a>
+            </div>
+
+            {% if form.errors %}
+                <div style="color: #d32f2f; background: #ffebee; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; font-size: 0.9rem;">
+                    Invalid username or password.
                 </div>
-                <div class="custom-field">
-                    <label>Password</label>
-                    {{ form.password }}
-                    <style>
-    .password-wrapper {
-        position: relative;
-        width: 100%;
-    }
-    .toggle-password {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: #777;
-        font-size: 1.1rem;
-        z-index: 10;
-    }
-    .toggle-password:hover {
-        color: #D4AF37; /* Royal Gold Color on Hover */
-    }
-    .forgot-link {
-        display: block;
-        text-align: right;
-        font-size: 0.9rem;
-        color: #0d6efd; /* Blue color jaisa aapne manga */
-        margin-top: 5px;
-        text-decoration: none;
-        font-weight: 500;
-        font-family: 'Poppins', sans-serif;
-    }
-    .forgot-link:hover {
-        text-decoration: underline;
-    }
-</style>
+            {% endif %}
 
-<div class="form-group" style="margin-bottom: 5px;">
-    <label for="id_password" style="font-weight: bold;">Password</label>
-    
-    <div class="password-wrapper">
-        {{ form.password }}
-        
-        <i class="fas fa-eye toggle-password" id="eyeIcon" onclick="togglePassword()"></i>
+            <button type="submit" class="btn-royal-submit">
+                LOGIN <i class="fas fa-sign-in-alt"></i>
+            </button>
+            
+            <div style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
+                New to A1 Bakery? <a href="{% url 'signup' %}" style="color: #D4AF37; font-weight: bold;">Create Account</a>
+            </div>
+        </form>
     </div>
-</div>
-
-<div style="margin-bottom: 20px;">
-    <a href="{% url 'password_reset' %}" class="forgot-link">
-        Forgot Password?
-    </a>
 </div>
 
 <script>
     function togglePassword() {
-        // Django default ID for password field is 'id_password'
+        // Django form password field ka ID 'id_password' hota hai
         const passwordInput = document.getElementById('id_password');
         const icon = document.getElementById('eyeIcon');
 
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
             icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash'); // Change icon to crossed eye
+            icon.classList.add('fa-eye-slash');
         } else {
             passwordInput.type = 'password';
             icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye'); // Back to normal eye
+            icon.classList.add('fa-eye');
         }
     }
 </script>
-                </div>
-            </div>
-
-            {% if form.errors %}
-                <div style="color: red; font-size: 13px; margin-bottom: 15px; text-align: center;">
-                    Invalid username or password.
-                </div>
-            {% endif %}
-
-            <div class="form-actions">
-                <button type="submit" class="btn-royal-submit">
-                    Login <i class="fas fa-sign-in-alt"></i>
-                </button>
-            </div>
-            
-            <div class="cancel-link" style="margin-top: 20px;">
-                New to A1 Bakery? <a href="{% url 'signup' %}" style="color: #D4AF37; font-weight: bold;">Create Account</a>
-            </div>
-        </form>
-
-    </div>
-</div>
 
 {% endblock %}
