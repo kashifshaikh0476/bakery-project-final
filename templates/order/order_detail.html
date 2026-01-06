@@ -6,84 +6,51 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-    /* === EXISTING STYLES === */
-    .whatsapp-btn-royal {
-        background-color: #25D366 !important; color: #ffffff !important; font-weight: 700;
-        border-radius: 50px; padding: 12px 35px; display: inline-flex; align-items: center; justify-content: center;
-        text-transform: none; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4); transition: all 0.3s ease;
-        margin-bottom: 15px; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; width: 100%; max-width: 300px;
-    }
-    .print-btn-royal {
-        background-color: #2C2C2C !important; color: #D4AF37 !important; font-weight: 700; border: 1px solid #D4AF37;
-        border-radius: 50px; padding: 10px 30px; display: inline-flex; align-items: center; justify-content: center;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-bottom: 10px; width: 100%; max-width: 300px; cursor: pointer;
-        font-family: 'Poppins', sans-serif; transition: 0.3s;
-    }
-    .card-action-center { text-align: center; display: flex; flex-direction: column; align-items: center; }
-    .other-links { margin-top: 15px; display: flex; gap: 20px; font-weight: 600; }
-
-    /* === FIXED: INVOICE STYLE === */
-    /* Ab hum ise screen se bahar nahi, balki display none karenge */
-    #printable-invoice { 
-        display: none; 
+    /* Invoice ko Screen se gayab rakhna (Lekin remove nahi karna) */
+    #printable-invoice {
+        display: none; /* Initially hidden */
         background: white;
-        width: 800px; /* Fixed width zaroori hai */
-        padding: 20px;
+        width: 800px;
+        padding: 40px;
+        color: #000;
     }
 
-    .invoice-box {
-        max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee;
-        font-size: 16px; line-height: 24px; font-family: 'Helvetica', Arial, sans-serif; color: #555;
-    }
+    /* Invoice Design */
+    .invoice-box { border: 2px solid #eee; padding: 30px; }
     .invoice-header { display: flex; justify-content: space-between; border-bottom: 2px solid #D4AF37; padding-bottom: 20px; margin-bottom: 20px; }
-    .company-title { font-size: 40px; color: #D4AF37; font-weight: bold; }
-    .invoice-table { width: 100%; line-height: inherit; text-align: left; border-collapse: collapse; }
-    .invoice-table td { padding: 10px; vertical-align: top; }
-    .invoice-table tr.heading td { background: #eee; border-bottom: 1px solid #ddd; font-weight: bold; }
-    .invoice-table tr.item td { border-bottom: 1px solid #eee; }
-    .invoice-table tr.total td { border-top: 2px solid #eee; font-weight: bold; font-size: 1.2rem; color: #D4AF37; }
+    .company-title { font-size: 36px; color: #D4AF37; font-weight: bold; font-family: 'Playfair Display', serif; }
+    .invoice-table { width: 100%; border-collapse: collapse; }
+    .invoice-table th { background: #f9f9f9; padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+    .invoice-table td { padding: 10px; border-bottom: 1px solid #eee; }
+    .total-row td { border-top: 2px solid #333; font-weight: bold; font-size: 1.1rem; }
+
+    /* Button Styles */
+    .btn-download {
+        background-color: #2C2C2C; color: #D4AF37; border: 1px solid #D4AF37;
+        padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: bold;
+    }
+    .btn-download:hover { background-color: #D4AF37; color: black; }
 </style>
 
-<div class='header-h1'>
-  <h1 style="font-family: 'Playfair Display', serif; color: #D4AF37; text-align: center;">Order Details</h1>
-</div>
-
-<div class="row">
-  <div class="col s12 m6 offset-m3"> 
-    <div class="card z-depth-3" style="border-radius: 20px; border: 1px solid #eee;">
-      <div class="card-content" style="padding: 30px;">
-        <span class="card-title" style="color: #D4AF37; font-weight: bold; text-align: center; font-family: 'Playfair Display', serif; font-size: 2rem;">
-            {{ order.product.name|default:"Unknown Item" }}
-            <br>
-            <span style="font-size: 1rem; color: #777; font-family: 'Poppins', sans-serif;">(Quantity: {{ order.quantity }})</span>
-        </span>
-        
-        <div class="divider" style="margin: 20px 0; background-color: #D4AF37;"></div>
-
-        <div style="font-family: 'Poppins', sans-serif; color: #444; font-size: 1.1rem;">
-            <p style="margin-bottom: 10px;"><i class="fas fa-user" style="color: #D4AF37; margin-right: 10px;"></i> <strong>{{ order.customer_name }}</strong></p>
-            <p style="margin-bottom: 10px;"><i class="fas fa-envelope" style="color: #D4AF37; margin-right: 10px;"></i> {{ order.customer_email }}</p>     
-            <p style="margin-bottom: 10px;"><i class="fas fa-phone" style="color: #D4AF37; margin-right: 10px;"></i> {{ order.customer_phone }}</p>
-            <div style="margin-top: 20px; background: #fffcf0; padding: 15px; border-radius: 10px; border: 1px dashed #D4AF37;">
-                <p><strong>Address:</strong> {{ order.address }}</p>
-                <p><strong>City:</strong> {{ order.city }}</p>
+<div class="row" style="margin-top: 40px;">
+    <div class="col s12 m6 offset-m3">
+        <div class="card z-depth-3" style="border-radius: 15px;">
+            <div class="card-content center-align">
+                <h4 style="color: #D4AF37; font-family: 'Playfair Display';">Order #{{ order.id }}</h4>
+                <p><strong>Item:</strong> {{ order.product.name }} (x{{ order.quantity }})</p>
+                <p><strong>Status:</strong> {{ order.status }}</p>
+                <div class="divider" style="margin: 20px 0;"></div>
+                
+                <a href="https://wa.me/918421857457?text=Order%20%23{{ order.id }}" target="_blank" class="btn" style="background-color: #25D366; border-radius: 50px; margin-bottom: 10px;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp Owner
+                </a>
+                <br>
+                <button onclick="downloadInvoice()" class="btn-download">
+                    <i class="fas fa-file-download"></i> SAVE INVOICE PDF
+                </button>
             </div>
         </div>
-      </div>
-
-      <div class="card-action card-action-center" style="padding-bottom: 30px; border-top: none;">
-          <a id="whatsappBtn" 
-             href="https://wa.me/918421857457?text=Hello%20A1%20Bakery,%20I%20placed%20a%20new%20order!%0A%0A*Order%20ID:*%20%23{{ order.id }}%0A*Item:*%20{{ order.product.name }}" 
-             target="_blank" class="whatsapp-btn-royal waves-effect waves-light">
-             <i class="fab fa-whatsapp"></i> Send Order to Owner
-          </a>
-
-          <button onclick="downloadInvoice()" class="print-btn-royal waves-effect waves-dark">
-             <i class="fas fa-file-download" style="margin-right: 10px;"></i> SAVE AS PDF
-          </button>
-      </div>
     </div>
-  </div>
 </div>
 
 <div id="printable-invoice">
@@ -92,16 +59,16 @@
             <div>
                 <div class="company-title">A1 Bakery</div>
                 <div>Malegaon, Maharashtra</div>
-                <div>Phone: +91 8421857457</div>
+                <div>+91 8421857457</div>
             </div>
             <div style="text-align: right;">
-                <h3 style="margin: 0; color: #333;">INVOICE</h3>
-                <div>Order #: <strong>{{ order.id }}</strong></div>
-                <div>Date: {% now "jS F Y" %}</div>
+                <h2 style="margin:0; color:#333;">INVOICE</h2>
+                <p>Date: {% now "d M Y" %}</p>
+                <p>Order ID: #{{ order.id }}</p>
             </div>
         </div>
 
-        <div style="margin-bottom: 20px;">
+        <div style="margin-bottom: 30px;">
             <strong>Bill To:</strong><br>
             {{ order.customer_name }}<br>
             {{ order.customer_phone }}<br>
@@ -109,30 +76,32 @@
         </div>
 
         <table class="invoice-table">
-            <tr class="heading">
-                <td>Item Description</td>
-                <td style="text-align: center;">Qty</td>
-                <td style="text-align: right;">Price</td>
-                <td style="text-align: right;">Total</td>
-            </tr>
-            <tr class="item">
-                <td>{{ order.product.name }}</td>
-                <td style="text-align: center;">{{ order.quantity }}</td>
-                <td style="text-align: right;">₹{{ order.product.price }}</td>
-                <td style="text-align: right;">₹{% widthratio order.product.price 1 order.quantity %}</td>
-            </tr>
-            <tr class="total">
-                <td></td><td></td>
-                <td style="text-align: right;">Total Amount:</td>
-                <td style="text-align: right;">₹{% widthratio order.product.price 1 order.quantity %}</td>
-            </tr>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th style="text-align: center;">Qty</th>
+                    <th style="text-align: right;">Price</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ order.product.name }}</td>
+                    <td style="text-align: center;">{{ order.quantity }}</td>
+                    <td style="text-align: right;">₹{{ order.product.price }}</td>
+                    <td style="text-align: right;">₹{% widthratio order.product.price 1 order.quantity %}</td>
+                </tr>
+                <tr class="total-row">
+                    <td></td><td></td>
+                    <td style="text-align: right;">Grand Total:</td>
+                    <td style="text-align: right; color: #D4AF37;">₹{% widthratio order.product.price 1 order.quantity %}</td>
+                </tr>
+            </tbody>
         </table>
-        
-        <div style="margin-top: 40px; text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
-            <p>Thank you for choosing A1 Bakery!</p>
-            <div style="text-align: right; font-weight: bold; margin-top: 30px;">
-                Authorized Signatory<br><span style="color: #D4AF37;">A1 Bakery</span>
-            </div>
+
+        <div style="margin-top: 50px; text-align: center; color: #777; font-size: 0.8rem;">
+            <p>Thank you for your business!</p>
+            <p>Authorized Signatory - A1 Bakery</p>
         </div>
     </div>
 </div>
@@ -141,25 +110,20 @@
 function downloadInvoice() {
     const element = document.getElementById('printable-invoice');
     
-    // 1. Temporary Show (Zaroori hai warna Blank PDF aayega)
+    // 1. Element ko temporarily visible karo taaki PDF blank na aaye
     element.style.display = 'block';
-    element.style.position = 'absolute';
-    element.style.top = '0';
-    element.style.left = '0';
-    element.style.zIndex = '9999'; // Sabse upar dikhega
-
+    
     const opt = {
-      margin: 0.5,
-      filename: 'A1_Bakery_Invoice_{{ order.id }}.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        margin: 0.5,
+        filename: 'A1_Invoice_{{ order.id }}.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true }, // High Quality Config
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
-    // 2. Save and Hide
+    // 2. Save karo aur phir wapas chupa do (.then ke andar)
     html2pdf().set(opt).from(element).save().then(function(){
-        // PDF banne ke baad wapas chupa do
-        element.style.display = 'none';
+        element.style.display = 'none'; // Wapas Hide kar diya
     });
 }
 </script>
