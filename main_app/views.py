@@ -4,7 +4,6 @@ from .forms import OrderForm, OrderTrackerForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-# Ye line zaroori hai calculation ke liye
 from django.db.models import Sum, F  
 
 # --- CUSTOM LOGOUT ---
@@ -33,9 +32,7 @@ def shop(request):
     products = Product.objects.all() 
     return render(request, 'shop.html', {'products': products})
 
-# --- STATUS FUNCTION (UPDATED) ---
-# Ab ye check karega ki request kahan se aayi hai (Dashboard se ya Detail se)
-# Aur wahi wapas bhejega.
+# --- STATUS FUNCTION ---
 def status(request, order_id):
     found_order = Order.objects.get(id=order_id)
     get_status = request.POST.get('status')
@@ -44,12 +41,11 @@ def status(request, order_id):
         found_order.status = get_status
         found_order.save()
     
-    # Check Previous Page URL
     previous_page = request.META.get('HTTP_REFERER')
     if previous_page:
         return redirect(previous_page)
         
-    return redirect('detail', order_id)
+    return redirect('detail', order_id=order_id)
 
 @login_required
 def order(request):
@@ -57,19 +53,12 @@ def order(request):
     context = { 'orders': orders }
     return render(request,'order/order.html', context)
 
-# --- ADMIN DASHBOARD (UPDATED) ---
-# Isme ab Counting aur Revenue ka Logic hai
+# --- ADMIN DASHBOARD ---
 @user_passes_test(lambda u: u.is_superuser) 
 def admin_order(request):
     orders = Order.objects.all().order_by('-id')
-    
-    # 1. Total Orders Count
     total_orders = orders.count()
-    
-    # 2. Pending Orders Count
     pending_count = Order.objects.filter(status='Pending').count()
-    
-    # 3. Revenue Calculation (Price * Quantity)
     revenue_data = Order.objects.aggregate(total=Sum(F('product__price') * F('quantity')))
     revenue = revenue_data['total'] if revenue_data['total'] else 0
     
@@ -105,7 +94,8 @@ def create_order(request, product_id):
             order.product = product
             order.save()
             
-            return redirect(f'/order/{order.id}/?placed=true') 
+            # FIX 1: Hardcoded path hata kar redirect name use kiya
+            return redirect('detail', order_id=order.id) 
     
     context = { 'form': form, 'product': product }
     return render(request, 'order/create_order.html', context)
@@ -134,7 +124,7 @@ def update_order(request, order_id):
         form = OrderForm(request.POST, instance=order)
         if form.is_valid():
             order=form.save()
-            return redirect('detail', order.id)
+            return redirect('detail', order_id=order.id)
 
 @login_required
 def order_tracker(request, order_id):
@@ -143,16 +133,17 @@ def order_tracker(request, order_id):
         new_tracking = form.save(commit=False)
         new_tracking.order_id = order_id
         new_tracking.save()
-        return redirect('detail', order_id)
+        return redirect('detail', order_id=order_id)
 
 def signup(request):
     error_message = ''
     if request.method == 'POST':
-        form = UserCreationForm (request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('order')
+            # FIX 2: Absolute slash '/' lagaya taaki domain se shuru ho
+            return redirect('/order/')
         else:
             error_message = 'Invalid sign up - try again'
     form = UserCreationForm()
