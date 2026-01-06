@@ -6,38 +6,33 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
+    /* === EXISTING STYLES === */
     .whatsapp-btn-royal {
         background-color: #25D366 !important; color: #ffffff !important; font-weight: 700;
         border-radius: 50px; padding: 12px 35px; display: inline-flex; align-items: center; justify-content: center;
         text-transform: none; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4); transition: all 0.3s ease;
         margin-bottom: 15px; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; width: 100%; max-width: 300px;
     }
-    .whatsapp-btn-royal:hover {
-        background-color: #1ebc57 !important; box-shadow: 0 8px 20px rgba(37, 211, 102, 0.6); transform: translateY(-3px);
-    }
-    .whatsapp-btn-royal i { margin-right: 12px; font-size: 1.4rem; }
-    
-    .card-action-center { text-align: center; display: flex; flex-direction: column; align-items: center; }
-    .other-links { margin-top: 15px; display: flex; gap: 20px; font-weight: 600; }
-
     .print-btn-royal {
         background-color: #2C2C2C !important; color: #D4AF37 !important; font-weight: 700; border: 1px solid #D4AF37;
         border-radius: 50px; padding: 10px 30px; display: inline-flex; align-items: center; justify-content: center;
         box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-bottom: 10px; width: 100%; max-width: 300px; cursor: pointer;
         font-family: 'Poppins', sans-serif; transition: 0.3s;
     }
-    .print-btn-royal:hover { background-color: #D4AF37 !important; color: #000 !important; transform: translateY(-2px); }
+    .card-action-center { text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .other-links { margin-top: 15px; display: flex; gap: 20px; font-weight: 600; }
 
-    /* Screen par Bill ko chupa ke rakhenge */
+    /* === FIXED: INVOICE STYLE === */
+    /* Ab hum ise screen se bahar nahi, balki display none karenge */
     #printable-invoice { 
-        position: absolute;
-        left: -9999px;
-        top: -9999px;
+        display: none; 
         background: white;
+        width: 800px; /* Fixed width zaroori hai */
+        padding: 20px;
     }
 
     .invoice-box {
-        width: 800px; padding: 30px; border: 1px solid #eee; background: white;
+        max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee;
         font-size: 16px; line-height: 24px; font-family: 'Helvetica', Arial, sans-serif; color: #555;
     }
     .invoice-header { display: flex; justify-content: space-between; border-bottom: 2px solid #D4AF37; padding-bottom: 20px; margin-bottom: 20px; }
@@ -58,13 +53,9 @@
     <div class="card z-depth-3" style="border-radius: 20px; border: 1px solid #eee;">
       <div class="card-content" style="padding: 30px;">
         <span class="card-title" style="color: #D4AF37; font-weight: bold; text-align: center; font-family: 'Playfair Display', serif; font-size: 2rem;">
-            {% if order.product %}
-                {{ order.product.name }}
-                <br>
-                <span style="font-size: 1rem; color: #777; font-family: 'Poppins', sans-serif;">(Quantity: {{ order.quantity }})</span>
-            {% else %}
-                Unknown Item
-            {% endif %}
+            {{ order.product.name|default:"Unknown Item" }}
+            <br>
+            <span style="font-size: 1rem; color: #777; font-family: 'Poppins', sans-serif;">(Quantity: {{ order.quantity }})</span>
         </span>
         
         <div class="divider" style="margin: 20px 0; background-color: #D4AF37;"></div>
@@ -73,42 +64,23 @@
             <p style="margin-bottom: 10px;"><i class="fas fa-user" style="color: #D4AF37; margin-right: 10px;"></i> <strong>{{ order.customer_name }}</strong></p>
             <p style="margin-bottom: 10px;"><i class="fas fa-envelope" style="color: #D4AF37; margin-right: 10px;"></i> {{ order.customer_email }}</p>     
             <p style="margin-bottom: 10px;"><i class="fas fa-phone" style="color: #D4AF37; margin-right: 10px;"></i> {{ order.customer_phone }}</p>
-            
             <div style="margin-top: 20px; background: #fffcf0; padding: 15px; border-radius: 10px; border: 1px dashed #D4AF37;">
-                <p style="margin-bottom: 5px;"><i class="fas fa-map-marker-alt" style="color: #D4AF37; margin-right: 10px;"></i> <strong>Address:</strong></p>
-                <p style="margin-left: 30px;">{{ order.address }}</p>
-                <p style="margin-left: 30px; margin-top: 5px;"><strong>City:</strong> {{ order.city }}</p>
+                <p><strong>Address:</strong> {{ order.address }}</p>
+                <p><strong>City:</strong> {{ order.city }}</p>
             </div>
-        </div>
-        
-        <div style="margin-top: 25px; text-align: center;">
-            <span class="new badge" style="float: none; padding: 8px 20px; font-size: 1rem; border-radius: 50px; background-color: #2C2C2C;" data-badge-caption="">
-                Status: {{ order.status }}
-            </span>
         </div>
       </div>
 
       <div class="card-action card-action-center" style="padding-bottom: 30px; border-top: none;">
-          
           <a id="whatsappBtn" 
-             href="https://wa.me/918421857457?text=Hello%20A1%20Bakery,%20I%20placed%20a%20new%20order!%0A%0A*Order%20ID:*%20%23{{ order.id }}%0A*Item:*%20{{ order.product.name }}%20(x{{ order.quantity }})%0A*Customer:*%20{{ order.customer_name }}%0A*Address:*%20{{ order.address }}%0A*Status:*%20{{ order.status }}" 
-             target="_blank" 
-             class="whatsapp-btn-royal waves-effect waves-light">
+             href="https://wa.me/918421857457?text=Hello%20A1%20Bakery,%20I%20placed%20a%20new%20order!%0A%0A*Order%20ID:*%20%23{{ order.id }}%0A*Item:*%20{{ order.product.name }}" 
+             target="_blank" class="whatsapp-btn-royal waves-effect waves-light">
              <i class="fab fa-whatsapp"></i> Send Order to Owner
           </a>
 
           <button onclick="downloadInvoice()" class="print-btn-royal waves-effect waves-dark">
-             <i class="fas fa-file-download" style="margin-right: 10px;"></i> Download Invoice
+             <i class="fas fa-file-download" style="margin-right: 10px;"></i> SAVE AS PDF
           </button>
-
-          <div class="other-links">
-              <a href="{% url 'shop' %}" style="color: #D4AF37;">
-                  <i class="fas fa-shopping-bag"></i> Shop Again
-              </a>
-              <a onclick="return confirm('Are you sure you want to delete this order?')" href="{% url 'delete_order' order.id %}" style="color: #d32f2f;">
-                  <i class="fas fa-trash"></i> Delete
-              </a>
-          </div>
       </div>
     </div>
   </div>
@@ -155,49 +127,41 @@
                 <td style="text-align: right;">₹{% widthratio order.product.price 1 order.quantity %}</td>
             </tr>
         </table>
-
-        <div style="margin-top: 40px; text-align: center; font-size: 0.9rem; color: #777; border-top: 1px solid #eee; padding-top: 20px;">
+        
+        <div style="margin-top: 40px; text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
             <p>Thank you for choosing A1 Bakery!</p>
-            <div style="margin-top: 30px; text-align: right; font-weight: bold; color: #000;">
-                Authorized Signatory<br>
-                <span style="font-family: 'Playfair Display', serif; color: #D4AF37;">A1 Bakery</span>
+            <div style="text-align: right; font-weight: bold; margin-top: 30px;">
+                Authorized Signatory<br><span style="color: #D4AF37;">A1 Bakery</span>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-  // Direct Download Function
-  function downloadInvoice() {
+function downloadInvoice() {
     const element = document.getElementById('printable-invoice');
     
-    // Check if library is ready
-    if (typeof html2pdf === 'undefined') {
-        alert("Library is still loading. Please try again in 2 seconds.");
-        return;
-    }
+    // 1. Temporary Show (Zaroori hai warna Blank PDF aayega)
+    element.style.display = 'block';
+    element.style.position = 'absolute';
+    element.style.top = '0';
+    element.style.left = '0';
+    element.style.zIndex = '9999'; // Sabse upar dikhega
 
-    const options = {
-      margin: 0.3,
+    const opt = {
+      margin: 0.5,
       filename: 'A1_Bakery_Invoice_{{ order.id }}.pdf',
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 3, useCORS: true },
+      html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
-    // This command triggers a direct download
-    html2pdf().set(options).from(element).save();
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('placed') === 'true') {
-        setTimeout(function() {
-            const btn = document.getElementById('whatsappBtn');
-            if(btn) btn.click();
-        }, 1000); 
-    }
-  });
+    // 2. Save and Hide
+    html2pdf().set(opt).from(element).save().then(function(){
+        // PDF banne ke baad wapas chupa do
+        element.style.display = 'none';
+    });
+}
 </script>
 
 {% endblock %}
