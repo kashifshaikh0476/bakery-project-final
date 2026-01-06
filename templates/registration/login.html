@@ -2,9 +2,8 @@
 {% load static %}
 
 {% block content %}
-
 <style>
-    /* Login Card Styling */
+    /* Styling for the Login Card */
     .form-wrapper {
         min-height: 100vh;
         display: flex;
@@ -12,76 +11,43 @@
         justify-content: center;
         background-image: url('https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=1600&q=80');
         background-size: cover;
-        background-position: center;
         position: relative;
     }
-    
     .overlay {
-        position: absolute; top:0; left:0; width:100%; height:100%; 
-        background: rgba(0,0,0,0.6);
+        position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6);
     }
-
-    .royal-form-card {
-        position: relative; z-index: 2; 
-        background: rgba(255, 255, 255, 0.95);
-        padding: 40px;
-        border-radius: 15px;
-        width: 100%;
-        max-width: 400px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        border-top: 5px solid #D4AF37;
+    .royal-card {
+        position: relative; z-index: 2; background: #fff; padding: 40px;
+        border-radius: 15px; width: 100%; max-width: 400px; border-top: 5px solid #D4AF37;
+    }
+    
+    /* Input Fields Styling */
+    .custom-field { margin-bottom: 20px; }
+    .custom-field label { font-weight: bold; display: block; margin-bottom: 5px; }
+    
+    /* Yeh zaroori hai taaki box sahi dikhe */
+    input[type="text"], input[type="password"] {
+        width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box;
     }
 
     /* Eye Icon Logic */
-    .password-wrapper {
-        position: relative;
-        width: 100%;
-    }
-    /* Eye icon ko input ke andar fit karne ke liye */
+    .password-wrapper { position: relative; }
     .toggle-password {
-        position: absolute;
-        right: 15px;
-        top: 45px; /* Input height ke hisaab se adjust kiya */
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: #777;
-        z-index: 10;
-    }
-    .toggle-password:hover { color: #D4AF37; }
-
-    .custom-field { margin-bottom: 20px; }
-    .custom-field label { font-weight: bold; color: #333; display: block; margin-bottom: 5px; }
-    
-    /* Input Fields Style */
-    input[type="text"], input[type="password"] {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-sizing: border-box; /* Zaroori hai taaki padding se size na badhe */
+        position: absolute; right: 15px; top: 40px; /* Icon ko box ke andar fit kiya */
+        cursor: pointer; color: #777;
     }
 
-    .forgot-link {
-        display: block; text-align: right; color: #0d6efd; 
-        font-size: 0.9rem; margin-top: 5px; text-decoration: none; font-weight: 500;
+    .btn-submit {
+        width: 100%; background: #D4AF37; color: white; padding: 12px; border: none;
+        border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.1rem;
     }
-    .btn-royal-submit {
-        width: 100%; background: #D4AF37; color: white; padding: 12px;
-        border: none; border-radius: 50px; font-size: 1.1rem; font-weight: bold;
-        cursor: pointer; transition: 0.3s;
-    }
-    .btn-royal-submit:hover { background: #b89628; }
 </style>
 
 <div class="form-wrapper">
     <div class="overlay"></div>
-
-    <div class="royal-form-card">
-        <div class="form-header" style="text-align: center; margin-bottom: 30px;">
-            <h1 style="font-family: 'Playfair Display', serif; color: #D4AF37; margin: 0;">Welcome Back</h1>
-            <p style="color: #666;">Login to manage your orders.</p>
-        </div>
-
+    <div class="royal-card">
+        <h2 style="text-align: center; font-family: 'Playfair Display', serif; color: #333;">Welcome Back</h2>
+        
         <form method="POST">
             {% csrf_token %}
             
@@ -92,36 +58,27 @@
 
             <div class="custom-field password-wrapper">
                 <label>Password</label>
-                {{ form.password }} <i class="fas fa-eye toggle-password" id="eyeIcon" onclick="togglePassword()"></i>
+                {{ form.password }}
+                <i class="fas fa-eye toggle-password" id="eyeIcon" onclick="togglePassword()"></i>
             </div>
 
-            <div style="margin-top: -15px; margin-bottom: 25px;">
-                <a href="{% url 'password_reset' %}" class="forgot-link">Forgot Password?</a>
+            <div style="text-align: right; margin-bottom: 20px; margin-top: -10px;">
+                <a href="{% url 'password_reset' %}" style="color: #0d6efd; text-decoration: none;">Forgot Password?</a>
             </div>
 
             {% if form.errors %}
-                <div style="color: #d32f2f; background: #ffebee; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; font-size: 0.9rem;">
-                    Invalid username or password.
-                </div>
+                <p style="color: red; text-align: center;">Invalid username or password.</p>
             {% endif %}
 
-            <button type="submit" class="btn-royal-submit">
-                LOGIN <i class="fas fa-sign-in-alt"></i>
-            </button>
-            
-            <div style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
-                New to A1 Bakery? <a href="{% url 'signup' %}" style="color: #D4AF37; font-weight: bold;">Create Account</a>
-            </div>
+            <button type="submit" class="btn-submit">LOGIN</button>
         </form>
     </div>
 </div>
 
 <script>
     function togglePassword() {
-        // Django form password field ka ID 'id_password' hota hai
-        const passwordInput = document.getElementById('id_password');
+        const passwordInput = document.getElementById('id_password'); // Django ka default ID
         const icon = document.getElementById('eyeIcon');
-
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
             icon.classList.remove('fa-eye');
@@ -133,5 +90,4 @@
         }
     }
 </script>
-
 {% endblock %}
