@@ -6,39 +6,30 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-    /* Invoice ko Screen se gayab rakhna (Lekin remove nahi karna) */
+    /* Invoice Chupa Rahega */
     #printable-invoice {
-        display: none; /* Initially hidden */
-        background: white;
-        width: 800px;
-        padding: 40px;
-        color: #000;
+        display: none; 
+        background: white; width: 800px; padding: 40px; color: #000;
     }
-
-    /* Invoice Design */
-    .invoice-box { border: 2px solid #eee; padding: 30px; }
-    .invoice-header { display: flex; justify-content: space-between; border-bottom: 2px solid #D4AF37; padding-bottom: 20px; margin-bottom: 20px; }
-    .company-title { font-size: 36px; color: #D4AF37; font-weight: bold; font-family: 'Playfair Display', serif; }
-    .invoice-table { width: 100%; border-collapse: collapse; }
-    .invoice-table th { background: #f9f9f9; padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-    .invoice-table td { padding: 10px; border-bottom: 1px solid #eee; }
-    .total-row td { border-top: 2px solid #333; font-weight: bold; font-size: 1.1rem; }
-
-    /* Button Styles */
+    /* Button Style */
     .btn-download {
         background-color: #2C2C2C; color: #D4AF37; border: 1px solid #D4AF37;
-        padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: bold;
+        padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold;
     }
     .btn-download:hover { background-color: #D4AF37; color: black; }
+    
+    /* Invoice Styles */
+    .invoice-header { display: flex; justify-content: space-between; border-bottom: 2px solid #D4AF37; padding-bottom: 20px; }
+    .invoice-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .invoice-table th, .invoice-table td { padding: 10px; border-bottom: 1px solid #eee; }
 </style>
 
-<div class="row" style="margin-top: 40px;">
+<div class="row" style="margin-top: 50px;">
     <div class="col s12 m6 offset-m3">
-        <div class="card z-depth-3" style="border-radius: 15px;">
-            <div class="card-content center-align">
-                <h4 style="color: #D4AF37; font-family: 'Playfair Display';">Order #{{ order.id }}</h4>
-                <p><strong>Item:</strong> {{ order.product.name }} (x{{ order.quantity }})</p>
-                <p><strong>Status:</strong> {{ order.status }}</p>
+        <div class="card z-depth-3" style="border-radius: 15px; padding: 20px;">
+            <div class="center-align">
+                <h4 style="color: #D4AF37;">Order #{{ order.id }}</h4>
+                <p>Status: {{ order.status }}</p>
                 <div class="divider" style="margin: 20px 0;"></div>
                 
                 <a href="https://wa.me/918421857457?text=Order%20%23{{ order.id }}" target="_blank" class="btn" style="background-color: #25D366; border-radius: 50px; margin-bottom: 10px;">
@@ -54,78 +45,67 @@
 </div>
 
 <div id="printable-invoice">
-    <div class="invoice-box">
-        <div class="invoice-header">
-            <div>
-                <div class="company-title">A1 Bakery</div>
-                <div>Malegaon, Maharashtra</div>
-                <div>+91 8421857457</div>
-            </div>
-            <div style="text-align: right;">
-                <h2 style="margin:0; color:#333;">INVOICE</h2>
-                <p>Date: {% now "d M Y" %}</p>
-                <p>Order ID: #{{ order.id }}</p>
-            </div>
+    <div class="invoice-header">
+        <div>
+            <h2 style="color: #D4AF37; margin:0;">A1 Bakery</h2>
+            <p>Malegaon, Maharashtra</p>
         </div>
-
-        <div style="margin-bottom: 30px;">
-            <strong>Bill To:</strong><br>
-            {{ order.customer_name }}<br>
-            {{ order.customer_phone }}<br>
-            {{ order.address }}, {{ order.city }}
+        <div style="text-align: right;">
+            <h3>INVOICE</h3>
+            <p>Order #{{ order.id }}</p>
+            <p>Date: {% now "d M Y" %}</p>
         </div>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <strong>Bill To:</strong><br>
+        {{ order.customer_name }}<br>
+        {{ order.customer_phone }}<br>
+        {{ order.address }}
+    </div>
 
-        <table class="invoice-table">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th style="text-align: center;">Qty</th>
-                    <th style="text-align: right;">Price</th>
-                    <th style="text-align: right;">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ order.product.name }}</td>
-                    <td style="text-align: center;">{{ order.quantity }}</td>
-                    <td style="text-align: right;">₹{{ order.product.price }}</td>
-                    <td style="text-align: right;">₹{% widthratio order.product.price 1 order.quantity %}</td>
-                </tr>
-                <tr class="total-row">
-                    <td></td><td></td>
-                    <td style="text-align: right;">Grand Total:</td>
-                    <td style="text-align: right; color: #D4AF37;">₹{% widthratio order.product.price 1 order.quantity %}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div style="margin-top: 50px; text-align: center; color: #777; font-size: 0.8rem;">
-            <p>Thank you for your business!</p>
-            <p>Authorized Signatory - A1 Bakery</p>
-        </div>
+    <table class="invoice-table">
+        <tr>
+            <th>Item</th><th>Qty</th><th>Price</th><th>Total</th>
+        </tr>
+        <tr>
+            <td>{{ order.product.name }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>₹{{ order.product.price }}</td>
+            <td>₹{% widthratio order.product.price 1 order.quantity %}</td>
+        </tr>
+        <tr>
+            <td></td><td></td>
+            <td><strong>Total:</strong></td>
+            <td><strong>₹{% widthratio order.product.price 1 order.quantity %}</strong></td>
+        </tr>
+    </table>
+    
+    <div style="margin-top: 40px; text-align: center; color: #777;">
+        <p>Authorized Signatory - A1 Bakery</p>
     </div>
 </div>
 
 <script>
-function downloadInvoice() {
-    const element = document.getElementById('printable-invoice');
-    
-    // 1. Element ko temporarily visible karo taaki PDF blank na aaye
-    element.style.display = 'block';
-    
-    const opt = {
-        margin: 0.5,
-        filename: 'A1_Invoice_{{ order.id }}.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true }, // High Quality Config
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
+    function downloadInvoice() {
+        const element = document.getElementById('printable-invoice');
+        
+        // 1. Invoice ko visible karo taaki PDF blank na aaye
+        element.style.display = 'block';
 
-    // 2. Save karo aur phir wapas chupa do (.then ke andar)
-    html2pdf().set(opt).from(element).save().then(function(){
-        element.style.display = 'none'; // Wapas Hide kar diya
-    });
-}
+        const opt = {
+            margin: 0.5,
+            filename: 'A1_Invoice_{{ order.id }}.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        // 2. Save karo aur wapas chupa do
+        html2pdf().set(opt).from(element).save().then(function(){
+            element.style.display = 'none';
+        });
+    }
 </script>
 
 {% endblock %}
