@@ -1,111 +1,167 @@
 {% extends 'base.html' %}
-{% load static %}
-
 {% block content %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-    /* Invoice Chupa Rahega */
-    #printable-invoice {
-        display: none; 
-        background: white; width: 800px; padding: 40px; color: #000;
-    }
-    /* Button Style */
-    .btn-download {
-        background-color: #2C2C2C; color: #D4AF37; border: 1px solid #D4AF37;
-        padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold;
-    }
-    .btn-download:hover { background-color: #D4AF37; color: black; }
-    
-    /* Invoice Styles */
-    .invoice-header { display: flex; justify-content: space-between; border-bottom: 2px solid #D4AF37; padding-bottom: 20px; }
-    .invoice-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    .invoice-table th, .invoice-table td { padding: 10px; border-bottom: 1px solid #eee; }
+.invoice-wrapper{
+    max-width:850px;
+    margin:40px auto;
+    background:#fff;
+    padding:40px;
+    font-family: Arial, Helvetica, sans-serif;
+    color:#333;
+    border:1px solid #eee;
+}
+.invoice-header{
+    display:flex;
+    justify-content:space-between;
+    border-bottom:2px solid #c9a227;
+    padding-bottom:15px;
+}
+.company-name{
+    font-size:32px;
+    font-weight:bold;
+    color:#c9a227;
+}
+.invoice-title{
+    font-size:28px;
+    font-weight:bold;
+}
+.meta{
+    margin-top:10px;
+    font-size:14px;
+}
+.bill-to{
+    margin-top:25px;
+    font-size:14px;
+}
+.invoice-table{
+    width:100%;
+    margin-top:30px;
+    border-collapse:collapse;
+}
+.invoice-table th{
+    background:#f5f5f5;
+    text-align:left;
+    padding:10px;
+}
+.invoice-table td{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+}
+.invoice-total{
+    text-align:right;
+    font-size:18px;
+    font-weight:bold;
+    color:#c9a227;
+}
+.footer{
+    margin-top:40px;
+    text-align:center;
+    font-size:13px;
+    color:#777;
+}
+.sign{
+    text-align:right;
+    margin-top:30px;
+    font-weight:bold;
+}
+.action-buttons{
+    text-align:center;
+    margin:30px 0;
+}
+.btn{
+    padding:12px 25px;
+    border-radius:30px;
+    border:none;
+    cursor:pointer;
+    margin:5px;
+    font-weight:bold;
+}
+.btn-print{ background:#222;color:#fff;}
+.btn-pdf{ background:#c9a227;color:#000;}
+.btn-wa{ background:#25D366;color:#fff;}
+
+@media print{
+    .action-buttons{display:none;}
+}
 </style>
 
-<div class="row" style="margin-top: 50px;">
-    <div class="col s12 m6 offset-m3">
-        <div class="card z-depth-3" style="border-radius: 15px; padding: 20px;">
-            <div class="center-align">
-                <h4 style="color: #D4AF37;">Order #{{ order.id }}</h4>
-                <p>Status: {{ order.status }}</p>
-                <div class="divider" style="margin: 20px 0;"></div>
-                
-                <a href="https://wa.me/918421857457?text=Order%20%23{{ order.id }}" target="_blank" class="btn" style="background-color: #25D366; border-radius: 50px; margin-bottom: 10px;">
-                    <i class="fab fa-whatsapp"></i> WhatsApp Owner
-                </a>
-                <br>
-                <button onclick="downloadInvoice()" class="btn-download">
-                    <i class="fas fa-file-download"></i> SAVE INVOICE PDF
-                </button>
+<div id="invoice" class="invoice-wrapper">
+
+    <div class="invoice-header">
+        <div>
+            <div class="company-name">A1 Bakery</div>
+            Malegaon, Maharashtra<br>
+            Phone: +91 8421857457
+        </div>
+        <div style="text-align:right">
+            <div class="invoice-title">INVOICE</div>
+            <div class="meta">
+                Order #: {{ order.id }}<br>
+                Date: {% now "jS F Y" %}
             </div>
         </div>
     </div>
-</div>
 
-<div id="printable-invoice">
-    <div class="invoice-header">
-        <div>
-            <h2 style="color: #D4AF37; margin:0;">A1 Bakery</h2>
-            <p>Malegaon, Maharashtra</p>
-        </div>
-        <div style="text-align: right;">
-            <h3>INVOICE</h3>
-            <p>Order #{{ order.id }}</p>
-            <p>Date: {% now "d M Y" %}</p>
-        </div>
-    </div>
-    
-    <div style="margin-top: 20px;">
+    <div class="bill-to">
         <strong>Bill To:</strong><br>
         {{ order.customer_name }}<br>
         {{ order.customer_phone }}<br>
-        {{ order.address }}
+        {{ order.address }}, {{ order.city }}
     </div>
 
     <table class="invoice-table">
         <tr>
-            <th>Item</th><th>Qty</th><th>Price</th><th>Total</th>
+            <th>Item Description</th>
+            <th>Qty</th>
+            <th style="text-align:right">Price</th>
+            <th style="text-align:right">Total</th>
         </tr>
         <tr>
             <td>{{ order.product.name }}</td>
             <td>{{ order.quantity }}</td>
-            <td>₹{{ order.product.price }}</td>
-            <td>₹{% widthratio order.product.price 1 order.quantity %}</td>
+            <td style="text-align:right">₹{{ order.product.price }}</td>
+            <td style="text-align:right">
+                ₹{% widthratio order.product.price 1 order.quantity %}
+            </td>
         </tr>
         <tr>
-            <td></td><td></td>
-            <td><strong>Total:</strong></td>
-            <td><strong>₹{% widthratio order.product.price 1 order.quantity %}</strong></td>
+            <td colspan="3" class="invoice-total">Total Amount:</td>
+            <td class="invoice-total">
+                ₹{% widthratio order.product.price 1 order.quantity %}
+            </td>
         </tr>
     </table>
-    
-    <div style="margin-top: 40px; text-align: center; color: #777;">
-        <p>Authorized Signatory - A1 Bakery</p>
+
+    <div class="footer">
+        Thank you for choosing A1 Bakery!
+        <div class="sign">
+            Authorized Signatory<br>
+            A1 Bakery
+        </div>
     </div>
 </div>
 
+<div class="action-buttons">
+    <button onclick="window.print()" class="btn btn-print">Print</button>
+    <button onclick="downloadPDF()" class="btn btn-pdf">Download PDF</button>
+    <a class="btn btn-wa"
+       target="_blank"
+       href="https://wa.me/918421857457?text=Invoice%20for%20Order%20%23{{ order.id }}">
+       WhatsApp
+    </a>
+</div>
+
 <script>
-    function downloadInvoice() {
-        const element = document.getElementById('printable-invoice');
-        
-        // 1. Invoice ko visible karo taaki PDF blank na aaye
-        element.style.display = 'block';
-
-        const opt = {
-            margin: 0.5,
-            filename: 'A1_Invoice_{{ order.id }}.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-
-        // 2. Save karo aur wapas chupa do
-        html2pdf().set(opt).from(element).save().then(function(){
-            element.style.display = 'none';
-        });
-    }
+function downloadPDF(){
+    html2pdf().from(document.getElementById('invoice')).set({
+        filename:'A1_Bakery_Invoice_{{ order.id }}.pdf',
+        html2canvas:{scale:2},
+        jsPDF:{unit:'in',format:'letter',orientation:'portrait'}
+    }).save();
+}
 </script>
 
 {% endblock %}
