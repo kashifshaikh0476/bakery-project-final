@@ -11,7 +11,7 @@ ALLOWED_HOSTS = ['*']
 APPEND_SLASH = True 
 
 INSTALLED_APPS = [
-    'jazzmin',
+    'jazzmin', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -34,7 +34,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'honeybee.urls'
+ROOT_URLCONF = 'A1.urls'
 
 TEMPLATES = [
     {
@@ -52,7 +52,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'honeybee.wsgi.application'
+WSGI_APPLICATION = 'A1.wsgi.application'
 
 DATABASES = {
     'default': {
@@ -81,37 +81,49 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-LOGIN_REDIRECT_URL = '/order/order'
-LOGOUT_REDIRECT_URL = 'home' # <-- Changed to 'home' name to match redirect
-
-GOOGLE_MAPS_API_KEY='AIzaSyCgs1hVUNcVzjhRtSA8XJSVBnQcm_yIzqo'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# === JAZZMIN SETTINGS (UPDATED FOR EASY ADMIN CREATION) ===
 
 JAZZMIN_SETTINGS = {
     "site_title": "A1 Bakery Admin",
-    "site_header": "A1 Bakery Manager",
+    "site_header": "A1 Bakery",
     "site_brand": "A1 Bakery",
     "welcome_sign": "Welcome, Owner!",
     "copyright": "A1 Bakery Ltd",
     "search_model": "main_app.Product",
-    "logout_link": "logout", # <-- Added to bypass Jazzmin logout page
+    "logout_link": "logout", 
+    
+    # English Comment: Keeping 'Users' visible so you can create new Admins
+    # But hiding 'Groups' to keep the sidebar clean.
+    "hide_models": ["auth.group"], 
+
     "topmenu_links": [
         {"name": "Open Website", "url": "home", "permissions": ["auth.view_user"]},
     ],
+
     "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
+        "auth.user": "fas fa-user-shield", # Professional Admin Icon
         "main_app.Product": "fas fa-birthday-cake",
         "main_app.Order": "fas fa-shopping-cart",
         "main_app.Feedback": "fas fa-star",
+    },
+    
+    "custom_links": {
+        "main_app": [{
+            "name": "View Orders", 
+            "url": "admin:main_app_order_changelist", 
+            "icon": "fas fa-clipboard-list"
+        }]
     },
 }
 
 JAZZMIN_UI_TWEAKS = {
     "theme": "darkly", 
     "navbar": "navbar-dark", 
-    "sidebar": "sidebar-dark-warning",
+    "sidebar": "sidebar-dark-warning", 
     "accent": "accent-warning",
+    "sidebar_nav_child_indent": True,
     "button_classes": {
         "primary": "btn-warning",
         "secondary": "btn-secondary",
