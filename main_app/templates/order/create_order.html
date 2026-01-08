@@ -4,52 +4,28 @@
 {% block content %}
 
 <style>
-    /* Form ke labels aur text ko black karo */
-    .royal-form-card label, 
-    .royal-form-card p, 
-    .royal-form-card h1, 
-    .royal-form-card h3,
-    .royal-form-card span {
-        color: #000 !important; /* Black Text */
-    }
     
-    /* Input box ko saaf dikhane ke liye styling */
-    .royal-form-card input[type="text"], 
-    .royal-form-card input[type="number"], 
-    .royal-form-card input[type="email"], 
-    .royal-form-card textarea,
-    .royal-form-card select {
-        color: #000 !important;
-        background-color: #fff !important; /* White Background */
-        border: 1px solid #ccc !important;
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 10px;
-        border-radius: 5px;
-    }
+    .royal-form-card label, .royal-form-card p, .royal-form-card h1, .royal-form-card h3, .royal-form-card span { color: #000 !important; }
+    .royal-form-card input, .royal-form-card textarea, .royal-form-card select { color: #000 !important; background-color: #fff !important; border: 1px solid #ccc !important; width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; }
     
-    /* Placeholder text dikhne ke liye */
-    ::placeholder {
-        color: #555 !important;
-    }
+    /* New Style for Validation */
+    .error-msg { color: #d9534f !important; font-size: 0.8rem; font-weight: bold; display: block; margin-top: 5px; }
+    #proceed-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 </style>
 
 <div class="form-wrapper">
     <div class="royal-form-card">
-        
         <div class="form-header">
             <h1>Start Your Order</h1>
-            
             {% if product %}
                 <div style="background: #fffcf0; border: 1px dashed #D4AF37; padding: 10px; margin: 10px 0; border-radius: 8px;">
                     <h3 style="color: #D4AF37 !important; margin: 0;">Item: {{ product.name }}</h3>
-                    <p style="margin: 5px 0 0 0; font-weight: bold;">Price: ₹{{ product.price }}</p>
+                    <p style="margin: 5px 0 0 0; font-weight: bold;">Price per unit: ₹<span id="unit-price">{{ product.price }}</span></p>
                 </div>
             {% endif %}
-            <p>Please enter your contact details to proceed.</p>
         </div>
 
-        <form method="POST" action="">
+        <form method="POST" action="" id="order-form">
             {% csrf_token %}
             
             <div class="form-fields-container">
@@ -57,62 +33,93 @@
             </div>
 
             <div class="payment-section" style="margin: 20px 0; background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #ddd;">
-                
                 <h4 style="color: #2C2C2C; margin-bottom: 15px; font-size: 1.1rem; font-weight: bold;">Select Payment Method:</h4>
 
                 <label style="display: block; cursor: pointer; margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
-                    <input name="payment_type" type="radio" value="cod" checked onclick="hideQR()" />
+                    <input name="payment_type" type="radio" value="cod" checked onclick="toggleQR('hide')" />
                     <span style="font-size: 1rem; color: #333; margin-left: 10px; font-weight: bold;">Pay on Pickup (Cash)</span>
                 </label>
 
                 <label style="display: block; cursor: pointer; margin-bottom: 10px; padding: 10px; border: 1px solid #D4AF37; border-radius: 8px; background-color: #fffcf0;">
-                    <input name="payment_type" type="radio" value="online" onclick="showQR()" />
+                    <input name="payment_type" type="radio" value="online" onclick="toggleQR('show')" id="pay-online-radio" />
                     <span style="font-size: 1rem; color: #333; margin-left: 10px; font-weight: bold;">Pay Online (UPI)</span>
-                    
-                    <div style="margin-left: 30px; margin-top: 5px;">
-                        <span style="background: #5f259f; color: white; padding: 2px 5px; border-radius: 3px; font-size: 0.7rem;">PhonePe</span>
-                        <span style="background: #1a73e8; color: white; padding: 2px 5px; border-radius: 3px; font-size: 0.7rem;">GPay</span>
-                        <span style="background: #008cff; color: white; padding: 2px 5px; border-radius: 3px; font-size: 0.7rem;">Paytm</span>
-                    </div>
                 </label>
-<div id="qr-box" style="display: none; text-align: center; margin-top: 15px; border-top: 2px dashed #D4AF37; padding-top: 15px;">
-    <p style="color: #D4AF37 !important; font-weight: bold; font-size: 0.9rem;">Scan & Pay to A1 Bakery</p>
-    
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=8421857457@ybl&pn=A1Bakery" 
-         alt="Payment QR" 
-         style="width: 150px; border-radius: 10px; border: 3px solid #2C2C2C;">
-    
-    <p style="font-size: 0.8rem; color: #555 !important; margin-top: 5px;">
-        Paying to: <strong>A1 Bakery</strong><br>
-        UPI ID: <strong>8421857457@ybl</strong>
-    </p>
 
-    <input type="text" name="transaction_id" placeholder="Enter Transaction/UTR ID (Optional)" 
-           style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px;">
-</div>
+                <div id="qr-box" style="display: none; text-align: center; margin-top: 15px; border-top: 2px dashed #D4AF37; padding-top: 15px;">
+                    <p style="color: #D4AF37 !important; font-weight: bold; font-size: 1.1rem;">Scan & Pay: <span id="total-display">₹{{ product.price }}</span></p>
+                    
+                    <img id="payment-qr" src="" alt="Payment QR" style="width: 160px; border-radius: 10px; border: 3px solid #2C2C2C; padding: 5px; background: #fff;">
+                    
+                    <p style="font-size: 0.8rem; color: #555 !important; margin-top: 5px;">
+                        A1 Bakery UPI: <strong>8421857457@ybl</strong>
+                    </p>
+
+                    <input type="text" name="transaction_id" id="utr-id" placeholder="Enter 12-Digit Transaction/UTR ID" 
+                           maxlength="12" style="width: 100%; padding: 10px; margin-top: 10px; border: 2px solid #D4AF37; border-radius: 5px;">
+                    <span id="utr-error" class="error-msg"></span>
+                </div>
             </div>
 
-            <script>
-                function showQR() {
-                    document.getElementById('qr-box').style.display = 'block';
-                }
-                function hideQR() {
-                    document.getElementById('qr-box').style.display = 'none';
-                }
-            </script>
-            
             <div class="form-actions">
-                <button type="submit" class="btn-royal-submit">
+                <button type="submit" class="btn-royal-submit" id="proceed-btn">
                     Proceed Next <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
-            
-            <div class="cancel-link">
-                <a href="{% url 'home' %}">Cancel & Go Back</a>
-            </div>
         </form>
-
     </div>
 </div>
+
+<script>
+    const unitPrice = parseFloat("{{ product.price }}");
+    const upiID = "8421857457@ybl";
+    const bizName = "A1Bakery";
+
+    // Function to update QR with dynamic amount
+    function updateSmartQR() {
+        const qtyInput = document.querySelector('input[name="quantity"]');
+        const qty = (qtyInput && qtyInput.value > 0) ? qtyInput.value : 1;
+        const total = unitPrice * qty;
+        
+        document.getElementById('total-display').innerText = "₹" + total;
+
+        // Generating UPI Link with Pre-filled Amount
+        const upiLink = `upi://pay?pa=${upiID}&pn=${bizName}&am=${total}&cu=INR`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+        
+        document.getElementById('payment-qr').src = qrUrl;
+    }
+
+    function toggleQR(action) {
+        const qrBox = document.getElementById('qr-box');
+        if (action === 'show') {
+            qrBox.style.display = 'block';
+            updateSmartQR();
+        } else {
+            qrBox.style.display = 'none';
+        }
+    }
+
+    //Strict Validation on Submit
+    document.getElementById('order-form').onsubmit = function(e) {
+        const isOnline = document.getElementById('pay-online-radio').checked;
+        const utrInput = document.getElementById('utr-id').value;
+        const errorSpan = document.getElementById('utr-error');
+
+        if (isOnline) {
+            if (utrInput.length < 12) {
+                e.preventDefault();
+                errorSpan.innerText = "Error: Please enter a valid 12-digit UTR/Transaction ID to confirm payment.";
+                alert("Please enter a valid 12-digit Transaction ID to proceed with your online payment.");
+                return false;
+            }
+        }
+    };
+
+    // Watch for quantity changes to update price in QR
+    const qtyField = document.querySelector('input[name="quantity"]');
+    if(qtyField) {
+        qtyField.addEventListener('input', updateSmartQR);
+    }
+</script>
 
 {% endblock %}
