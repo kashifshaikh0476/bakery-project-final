@@ -1,95 +1,100 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-.invoice-wrapper{
-    max-width:850px;
-    margin:40px auto;
-    background:#fff;
-    padding:40px;
-    font-family: Arial, Helvetica, sans-serif;
-    color:#333;
-    border:1px solid #eee;
+/* Invoice Design */
+.invoice-wrapper {
+    max-width: 850px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 40px;
+    font-family: 'Poppins', Arial, sans-serif;
+    color: #333;
+    border: 1px solid #eee;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
-.invoice-header{
-    display:flex;
-    justify-content:space-between;
-    border-bottom:2px solid #c9a227;
-    padding-bottom:15px;
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #c9a227;
+    padding-bottom: 15px;
 }
-.company-name{
-    font-size:32px;
-    font-weight:bold;
-    color:#c9a227;
+.company-name {
+    font-size: 32px;
+    font-weight: bold;
+    color: #c9a227;
 }
-.invoice-title{
-    font-size:28px;
-    font-weight:bold;
+.invoice-title {
+    font-size: 28px;
+    font-weight: bold;
 }
-.meta{
-    margin-top:10px;
-    font-size:14px;
+.meta { margin-top: 10px; font-size: 14px; }
+.bill-to { margin-top: 25px; font-size: 14px; }
+.invoice-table {
+    width: 100%;
+    margin-top: 30px;
+    border-collapse: collapse;
 }
-.bill-to{
-    margin-top:25px;
-    font-size:14px;
+.invoice-table th {
+    background: #f5f5f5;
+    text-align: left;
+    padding: 10px;
+    border-bottom: 2px solid #ddd;
 }
-.invoice-table{
-    width:100%;
-    margin-top:30px;
-    border-collapse:collapse;
+.invoice-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
 }
-.invoice-table th{
-    background:#f5f5f5;
-    text-align:left;
-    padding:10px;
+.invoice-total {
+    text-align: right;
+    font-size: 18px;
+    font-weight: bold;
+    color: #c9a227;
+    padding-top: 15px;
 }
-.invoice-table td{
-    padding:10px;
-    border-bottom:1px solid #ddd;
+.footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 13px;
+    color: #777;
 }
-.invoice-total{
-    text-align:right;
-    font-size:18px;
-    font-weight:bold;
-    color:#c9a227;
+.sign {
+    text-align: right;
+    margin-top: 30px;
+    font-weight: bold;
+    color: #000;
 }
-.footer{
-    margin-top:40px;
-    text-align:center;
-    font-size:13px;
-    color:#777;
-}
-.sign{
-    text-align:right;
-    margin-top:30px;
-    font-weight:bold;
-}
-.action-buttons{
-    text-align:center;
-    margin:30px 0;
-}
-.btn{
-    padding:12px 25px;
-    border-radius:30px;
-    border:none;
-    cursor:pointer;
-    margin:5px;
-    font-weight:bold;
-}
-.btn-print{ background:#222;color:#fff;}
-.btn-pdf{ background:#c9a227;color:#000;}
-.btn-wa{ background:#25D366;color:#fff;}
 
-@media print{
-    .action-buttons{display:none;}
+/* Action Buttons */
+.action-buttons {
+    text-align: center;
+    margin: 30px 0;
+}
+.btn {
+    padding: 12px 25px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    margin: 5px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+.btn-print { background: #222; color: #fff; }
+.btn-pdf { background: #c9a227; color: #000; }
+.btn-wa { background: #25D366; color: #fff; }
+
+@media print {
+    .action-buttons { display: none; }
 }
 </style>
 
 <div id="invoice" class="invoice-wrapper">
-
     <div class="invoice-header">
         <div>
             <div class="company-name">A1 Bakery</div>
@@ -99,8 +104,8 @@
         <div style="text-align:right">
             <div class="invoice-title">INVOICE</div>
             <div class="meta">
-                Order #: {{ order.id }}<br>
-                Date: {% now "jS F Y" %}
+                Order #: <strong>{{ order.id }}</strong><br>
+                Date: <strong>{% now "jS F Y" %}</strong>
             </div>
         </div>
     </div>
@@ -113,33 +118,37 @@
     </div>
 
     <table class="invoice-table">
-        <tr>
-            <th>Item Description</th>
-            <th>Qty</th>
-            <th style="text-align:right">Price</th>
-            <th style="text-align:right">Total</th>
-        </tr>
-        <tr>
-            <td>{{ order.product.name }}</td>
-            <td>{{ order.quantity }}</td>
-            <td style="text-align:right">₹{{ order.product.price }}</td>
-            <td style="text-align:right">
-                ₹{% widthratio order.product.price 1 order.quantity %}
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3" class="invoice-total">Total Amount:</td>
-            <td class="invoice-total">
-                ₹{% widthratio order.product.price 1 order.quantity %}
-            </td>
-        </tr>
+        <thead>
+            <tr>
+                <th>Item Description</th>
+                <th>Qty</th>
+                <th style="text-align:right">Price</th>
+                <th style="text-align:right">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ order.product.name }}</td>
+                <td>{{ order.quantity }}</td>
+                <td style="text-align:right">₹{{ order.product.price }}</td>
+                <td style="text-align:right">
+                    ₹{% widthratio order.product.price 1 order.quantity %}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" class="invoice-total">Total Amount:</td>
+                <td class="invoice-total">
+                    ₹{% widthratio order.product.price 1 order.quantity %}
+                </td>
+            </tr>
+        </tbody>
     </table>
 
     <div class="footer">
         Thank you for choosing A1 Bakery!
         <div class="sign">
             Authorized Signatory<br>
-            A1 Bakery
+            <span style="color:#c9a227">A1 Bakery</span>
         </div>
     </div>
 </div>
@@ -147,19 +156,22 @@
 <div class="action-buttons">
     <button onclick="window.print()" class="btn btn-print">Print</button>
     <button onclick="downloadPDF()" class="btn btn-pdf">Download PDF</button>
+    
     <a class="btn btn-wa"
        target="_blank"
-       href="https://wa.me/918421857457?text=Invoice%20for%20Order%20%23{{ order.id }}">
-       WhatsApp
+       href="https://wa.me/918421857457?text=🟢%20*NEW%20ORDER%20-%20A1%20BAKERY*%20🟢%0A%0A*Order%20ID:*%20%23{{ order.id }}%0A*Customer:*%20{{ order.customer_name }}%0A*Phone:*%20{{ order.customer_phone }}%0A%0A*Item:*%20{{ order.product.name }}%0A*Qty:*%20{{ order.quantity }}%0A*Total%20Amount:*%20₹{% widthratio order.product.price 1 order.quantity %}%0A%0A*Address:*%20{{ order.address }},%20{{ order.city }}%0A%0A--------------------------%0A*View%20Invoice:*%20{{ request.build_absolute_uri }}">
+        WhatsApp Admin
     </a>
 </div>
 
 <script>
 function downloadPDF(){
-    html2pdf().from(document.getElementById('invoice')).set({
-        filename:'A1_Bakery_Invoice_{{ order.id }}.pdf',
-        html2canvas:{scale:2},
-        jsPDF:{unit:'in',format:'letter',orientation:'portrait'}
+    const element = document.getElementById('invoice');
+    html2pdf().from(element).set({
+        filename: 'A1_Bakery_Invoice_{{ order.id }}.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     }).save();
 }
 </script>
