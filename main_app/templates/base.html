@@ -17,6 +17,35 @@
     @import url('https://fonts.googleapis.com/css2?family=Sacramento&display=swap');
     
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Professional Logout Modal Styling */
+    #logoutModal {
+        border-radius: 15px;
+        max-width: 450px;
+        background-color: #1a1a1a; /* Dark background */
+        color: white;
+        border: 2px solid #D4AF37; /* Gold Border */
+    }
+    .modal .modal-footer {
+        background-color: #1a1a1a;
+        border-top: 1px solid #333;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding-bottom: 25px;
+    }
+    .btn-confirm-logout {
+        background-color: #D4AF37 !important;
+        color: black !important;
+        font-weight: bold !important;
+        border-radius: 25px !important;
+    }
+    .btn-cancel-logout {
+        background-color: transparent !important;
+        color: #D4AF37 !important;
+        border: 1px solid #D4AF37 !important;
+        border-radius: 25px !important;
+    }
   </style>
 </head>
 <body>
@@ -45,24 +74,23 @@
                 
                 <ul class="nav-links">
                     <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'about' %}">About</a></li> <li><a href="{% url 'shop' %}">Shop</a></li>
+                    <li><a href="{% url 'about' %}">About</a></li> 
+                    <li><a href="{% url 'shop' %}">Product</a></li>
 
                     {% if user.is_authenticated %}
                         <li><a href="{% url 'order' %}">My Orders</a></li>
                         <li>
-                            <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" style="background:none; border:none; color:inherit; cursor:pointer; padding:0; font-family: inherit; font-size: inherit;">
-                                    Logout
-                                </button>
-                            </form>
+                            <a href="#logoutModal" class="modal-trigger" style="color: #D4AF37; cursor: pointer;">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
                         </li>
                     {% else %}
                         <li><a href="{% url 'login' %}">Log In</a></li>
                         <li><a href="{% url 'signup' %}" class="btn-signup">Sign Up</a></li>
                     {% endif %}
 
-                    {% if user.is_superuser %} <li><a href="{% url 'admin_order' %}" class="admin-nav-link">
+                    {% if user.is_superuser %} 
+                        <li><a href="{% url 'admin_order' %}" class="admin-nav-link">
                             <i class="fas fa-crown"></i> Orders
                         </a></li>
                     {% endif %}  
@@ -76,8 +104,26 @@
     {% endblock %}
   </main>
 
+  <div id="logoutModal" class="modal">
+    <div class="modal-content center-align">
+        <h4 style="font-family: 'Sacramento', cursive; color: #D4AF37; font-size: 3rem; margin-bottom: 0;">A1 Bakery</h4>
+        <div style="height: 2px; background: #D4AF37; width: 60px; margin: 0 auto 20px;"></div>
+        <p style="font-size: 1.3rem; font-weight: 500;">Are you sure you want to sign out?</p>
+        <p style="color: #888; font-size: 0.9rem;">You will need to login again to manage your orders.</p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect btn-flat btn-cancel-logout">Stay Logged In</a>
+        
+        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="waves-effect waves-light btn btn-confirm-logout">
+                Yes, Sign Out
+            </button>
+        </form>
+    </div>
+  </div>
+
   <footer class="final-royal-footer">
-    
     <div class="ribbon-wrapper">
         <div class="gold-ribbon">
             ~ Connect With Us ~
@@ -85,7 +131,6 @@
     </div>
 
     <div class="footer-inner-container">
-        
         <div class="footer-column brand-column">
             <div class="logo-lockup">
                 <img src="{% static 'images/logo.png' %}" alt="Logo" class="footer-logo-final">
@@ -103,7 +148,6 @@
         <div class="footer-column links-column">
             <h4 class="column-title">Quick Menu</h4>
             <div class="title-underline"></div>
-            
             <ul class="final-links">
                 <li><a href="{% url 'home' %}">Home</a></li>
                 <li><a href="{% url 'shop' %}">Our Menu</a></li>
@@ -127,10 +171,22 @@
                 &copy; 2025 A1 Bakery. <br>All Rights Reserved.
             </div>
         </div>
-
     </div>
   </footer>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.2/vanilla-tilt.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Materialize Modals
+        var modals = document.querySelectorAll('.modal');
+        M.Modal.init(modals, {
+            opacity: 0.8,
+            inDuration: 300,
+            outDuration: 200,
+            dismissible: true
+        });
+    });
+  </script>
 
 </body>
 </html>
