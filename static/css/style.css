@@ -2108,6 +2108,7 @@ html {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
 }
+
 /* Input boxes ko stylish aur modern banane ke liye */
 input.form-control, 
 .royal-form-card input {
