@@ -18,13 +18,32 @@
     
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+    /* --- YE PART BUTTON KO NAVBAR MEIN FIT KAREGA --- */
+    .nav-links li a.btn-signup {
+        border: 2px solid #D4AF37 !important;
+        height: 36px !important;             
+        line-height: 32px !important;        
+        margin-top: 14px !important;         
+        display: inline-flex !important;
+        align-items: center !important;
+        padding: 0 15px !important;
+        border-radius: 6px !important;
+        background: transparent !important;
+        transition: all 0.3s ease;
+    }
+
+    .nav-links li a.btn-signup:hover {
+        background-color: #D4AF37 !important;
+        color: #000 !important;
+    }
+
     /* Professional Logout Modal Styling */
     #logoutModal {
         border-radius: 15px;
         max-width: 450px;
-        background-color: #1a1a1a; /* Dark background */
+        background-color: #1a1a1a; 
         color: white;
-        border: 2px solid #D4AF37; /* Gold Border */
+        border: 2px solid #D4AF37; 
     }
     .modal .modal-footer {
         background-color: #1a1a1a;
@@ -125,11 +144,8 @@
 
   <footer class="final-royal-footer">
     <div class="ribbon-wrapper">
-        <div class="gold-ribbon">
-            ~ Connect With Us ~
-        </div>
+        <div class="gold-ribbon">~ Connect With Us ~</div>
     </div>
-
     <div class="footer-inner-container">
         <div class="footer-column brand-column">
             <div class="logo-lockup">
@@ -137,14 +153,12 @@
                 <span class="brand-text-final">A1 Bakery</span>
             </div>
             <p class="brand-tagline">"Eat a taste of happiness"</p>
-            
             <div class="info-block">
                 <p><i class="fas fa-map-marker-alt gold-icon"></i> Misri Khan Ka Bada, Malegaon</p>
                 <p><i class="fas fa-phone-alt gold-icon"></i> +91 8421857457</p>
                 <p><i class="fas fa-envelope gold-icon"></i> a1bakery@gmail.com</p>
             </div>
         </div>
-
         <div class="footer-column links-column">
             <h4 class="column-title">Quick Menu</h4>
             <div class="title-underline"></div>
@@ -155,21 +169,15 @@
                 <li><a href="{% url 'signup' %}">Join Membership</a></li>
             </ul>
         </div>
-
         <div class="footer-column social-column">
             <h4 class="column-title">Follow Us</h4>
             <div class="title-underline"></div>
-            <p class="social-desc">Don't miss our latest offers & treats!</p>
-
             <div class="final-social-icons">
                 <a href="#" class="icon-box fb"><i class="fab fa-facebook-f"></i></a>
                 <a href="#" class="icon-box insta"><i class="fab fa-instagram"></i></a>
                 <a href="https://wa.me/918421857457" class="icon-box wa"><i class="fab fa-whatsapp"></i></a>
             </div>
-
-            <div class="footer-bottom-text">
-                &copy; 2025 A1 Bakery. <br>All Rights Reserved.
-            </div>
+            <div class="footer-bottom-text">&copy; 2025 A1 Bakery. <br>All Rights Reserved.</div>
         </div>
     </div>
   </footer>
@@ -177,16 +185,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.2/vanilla-tilt.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Materialize Modals
         var modals = document.querySelectorAll('.modal');
-        M.Modal.init(modals, {
-            opacity: 0.8,
-            inDuration: 300,
-            outDuration: 200,
-            dismissible: true
-        });
+        M.Modal.init(modals, { opacity: 0.8, dismissible: true });
     });
   </script>
-
 </body>
 </html>
