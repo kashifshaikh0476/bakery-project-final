@@ -3,11 +3,121 @@
 
 {% block content %}
 
-<div class="form-wrapper" style="background-image: url('https://images.unsplash.com/photo-1555507036-ab1f40388085?w=1600&q=80'); background-size: cover; background-position: center;">
-    
-    <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6);"></div>
+<style>
+    /* === 1. BACKGROUND & LAYOUT === */
+    .form-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* Bakery Theme Background */
+        background-image: url('https://images.unsplash.com/photo-1555507036-ab1f40388085?w=1600&q=80');
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+    .overlay {
+        position: absolute; top:0; left:0; width:100%; height:100%; 
+        background: rgba(0,0,0,0.7); /* Dark Overlay for readability */
+    }
 
-    <div class="royal-form-card" style="position: relative; z-index: 2; max-width: 450px;">
+    /* === 2. ROYAL CARD DESIGN === */
+    .royal-form-card {
+        position: relative; z-index: 2; 
+        background: #fff; 
+        padding: 40px 30px;
+        border-radius: 15px; 
+        width: 100%; max-width: 500px; /* Thoda chauda signup ke liye */
+        border-top: 5px solid #D4AF37; /* Gold Top Border */
+        box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    }
+
+    .form-header h1 {
+        font-family: 'Playfair Display', serif; 
+        color: #D4AF37; 
+        font-weight: bold; 
+        text-align: center;
+        margin-top: 0;
+    }
+    .form-header p {
+        text-align: center; color: #666; font-size: 0.95rem; margin-bottom: 30px;
+    }
+
+    /* === 3. INPUT BOXES (FORCE VISIBLE) === */
+    /* !important use kar rahe hain taaki Materialize CSS styling na bigade */
+    
+    .custom-field { margin-bottom: 20px; position: relative; }
+    
+    .custom-field label { 
+        font-weight: bold; 
+        color: #333 !important; 
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        display: block;
+        transform: none !important;
+        position: static !important;
+    }
+    
+    /* Input Styling like Login Page */
+    .royal-input {
+        width: 100% !important;
+        height: 45px !important;
+        padding: 10px 15px !important;
+        background-color: #f4f4f4 !important; /* Light Grey Background */
+        border: 2px solid #ccc !important; 
+        border-radius: 8px !important;
+        box-sizing: border-box !important;
+        font-size: 1rem !important;
+        color: #333 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+    }
+    /* Focus Effect */
+    .royal-input:focus {
+        border-color: #D4AF37 !important;
+        background-color: #fff !important;
+        box-shadow: 0 0 8px rgba(212, 175, 55, 0.3) !important;
+    }
+
+    /* === 4. EYE ICON LOGIC === */
+    .password-wrapper { position: relative; }
+    
+    .toggle-password {
+        position: absolute; 
+        right: 15px; 
+        top: 38px; /* Input ke andar fit kiya */
+        cursor: pointer; 
+        color: #777;
+        font-size: 1.1rem;
+        z-index: 10;
+    }
+    .toggle-password:hover { color: #D4AF37; }
+
+    /* === 5. BUTTON === */
+    .btn-royal-submit {
+        width: 100%; 
+        background: #D4AF37 !important; 
+        color: white !important; 
+        padding: 12px !important; 
+        border: none !important;
+        border-radius: 50px !important; 
+        font-weight: bold !important; 
+        cursor: pointer; 
+        font-size: 1.1rem;
+        margin-top: 10px;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        display: flex; justify-content: center; align-items: center; gap: 10px;
+    }
+    .btn-royal-submit:hover { background: #b89628 !important; }
+
+    .help-text { color: #888; font-size: 0.8rem; margin-top: 5px; display: block; line-height: 1.2; }
+    .error-text { color: #d32f2f; font-size: 0.85rem; margin-top: 5px; display: block; font-weight: 500; }
+</style>
+
+<div class="form-wrapper">
+    <div class="overlay"></div>
+
+    <div class="royal-form-card">
         
         <div class="form-header">
             <h1>Join A1 Bakery</h1>
@@ -19,34 +129,77 @@
             
             <div class="form-fields-container">
                 {% for field in form %}
-                    <div class="custom-field">
+                    <div class="custom-field {% if 'password' in field.html_name %}password-wrapper{% endif %}">
+                        
                         <label>{{ field.label }}</label>
+                        
                         {{ field }}
+
+                        {% if 'password' in field.html_name %}
+                            <i class="fas fa-eye toggle-password" onclick="togglePassword(this)"></i>
+                        {% endif %}
+
                         {% if field.help_text %}
-                            <small style="color: #888; font-size: 11px;">{{ field.help_text }}</small>
+                            <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <span class="error-text"><i class="fas fa-exclamation-circle"></i> {{ error }}</span>
+                            {% endfor %}
                         {% endif %}
                     </div>
                 {% endfor %}
             </div>
 
-            {% if form.errors %}
-                <div style="color: red; font-size: 13px; margin-bottom: 15px; text-align: center;">
-                    Please correct the errors above.
+            {% if form.non_field_errors %}
+                <div style="background: #ffebee; color: #d32f2f; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; font-size: 0.9rem;">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
                 </div>
             {% endif %}
 
             <div class="form-actions">
                 <button type="submit" class="btn-royal-submit">
-                    Sign Up <i class="fas fa-user-plus"></i>
+                    SIGN UP <i class="fas fa-user-plus"></i>
                 </button>
             </div>
             
-            <div class="cancel-link" style="margin-top: 20px;">
+            <div style="text-align: center; margin-top: 20px; font-size: 0.9rem; color: #555;">
                 Already have an account? <a href="{% url 'login' %}" style="color: #D4AF37; font-weight: bold;">Login Here</a>
             </div>
         </form>
 
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Force Styling on Inputs (Taaki boxes visible rahein)
+        var inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+        inputs.forEach(function(input) {
+            input.classList.add('royal-input');
+        });
+    });
+
+    // 2. Eye Icon Toggle Function
+    function togglePassword(icon) {
+        // Icon ke bagal wala input dhoondo (Previous Sibling logic)
+        // Django template mein field pehle aata hai, phir icon
+        var container = icon.closest('.password-wrapper');
+        var input = container.querySelector('input');
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+</script>
 
 {% endblock %}
